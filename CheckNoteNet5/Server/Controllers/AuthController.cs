@@ -18,7 +18,13 @@ namespace CheckNoteNet5.Server.Controllers
             this.authService = authService;
         }
 
-        [HttpPost]
-        public async Task<ActionResult<User.Model>> Register(Register user) => await authService.Register(user); 
+        //[HttpPost]
+        //public async Task<ActionResult<User.Model>> Register(Register user) => await authService.Register(user);
+
+        //[HttpPost]
+        //public async Task<ActionResult> Login(Login user) => await authService.Login(user);
+
+        //[HttpPost]
+        //public async Task<ActionResult<string>> Jwt(Login user) => await authService.Jwt(user);
     }
 }

@@ -1,10 +1,9 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using CheckNoteNet5.Shared.Models;
+using CheckNoteNet5.Shared.Models.Auth;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using CheckNoteNet5.Shared.Models;
-using Auth = CheckNoteNet5.Shared.Models.Auth;
+using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
-using CheckNoteNet5.Shared.Models.Auth;
 
 namespace CheckNoteNet5.Server
 {

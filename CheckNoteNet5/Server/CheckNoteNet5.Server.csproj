@@ -24,9 +24,5 @@
     <ProjectReference Include="..\Shared\CheckNoteNet5.Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Services\Extensions\" />
-  </ItemGroup>
-
 
 </Project>

@@ -1,13 +1,21 @@
-﻿@page "/fetchdata"
-@using CheckNoteNet5.Shared
-@inject HttpClient Http
+﻿@page "/fetchdata/{id:int}"
+@using CheckNoteNet5.Shared.Services 
+@inject INoteService NoteService
 
 <h1>Weather forecast</h1>
 
 <p>This component demonstrates fetching data from the server.</p>
 
+@code 
+{ 
+    [Parameter]
+    public int Id { get; set; }
 
-@code {
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await NoteService.Get(Id);
 
-
+        Console.WriteLine("result:");
+        Console.WriteLine(result.IsOk);
+    }
 }

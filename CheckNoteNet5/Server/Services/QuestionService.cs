@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using CheckNoteNet5.Shared.Models;
-using Microsoft.EntityFrameworkCore;
+using CheckNoteNet5.Shared.Services;
 using System.Threading.Tasks;
 
 namespace CheckNoteNet5.Server.Services
@@ -16,7 +16,7 @@ namespace CheckNoteNet5.Server.Services
             this.mapper = mapper;
         }
 
-        public Question.Model Convert(Question question)
+        private Question.Model Convert(Question question)
         {
             switch (question.Type)
             {
@@ -27,23 +27,27 @@ namespace CheckNoteNet5.Server.Services
                     return mapper.Map<Question.UnaryModel>(question);
             }
 
-            // custom exception
-            throw new System.Exception(); 
+            return null;
         }
 
-        public async Task<Question.Model> Add(Question question)
+        public async Task<ServiceResult<Question.Model>> Add(Question question)
         {
+            var model = Convert(question);
+            var result = new ServiceResult<Question.Model>();
+
+            if (model == null) return result.Error<ConflictError>();
+
             await dbContext.Questions.AddAsync(question);
             await dbContext.SaveChangesAsync();
 
-            return Convert(question);
+            return result.Ok(model);
         }
 
-        public async Task<Question.Model> Get(int id)
+        public async Task<ServiceResult<Question.Model>> Get(int id)
         {
-            var question = await dbContext.Questions.FirstOrDefaultAsync(q => q.Id == id);
+            var question = await dbContext.Questions.FindAsync(id);
 
-            return question != null ? Convert(question) : null;
+            return ServiceResult<Question.Model>.Ok(Convert(question)); //!
         }
     }
 }

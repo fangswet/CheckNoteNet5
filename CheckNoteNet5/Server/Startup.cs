@@ -2,6 +2,7 @@ using AutoMapper;
 using CheckNoteNet5.Server.Services;
 using CheckNoteNet5.Shared.Models;
 using CheckNoteNet5.Shared.Models.Auth;
+using CheckNoteNet5.Shared.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
@@ -67,19 +68,15 @@ namespace CheckNoteNet5.Server
 
             services.AddControllersWithViews();
             services.AddRazorPages();
-            services.AddScoped(services =>
-                new HttpClient
-                {
-                    BaseAddress = new Uri(services.GetRequiredService<NavigationManager>().BaseUri)
-                }
-            );
 
             services.AddAutoMapper(typeof(Startup));
 
             services.AddScoped<JwtService>();
             services.AddScoped<AuthService>();
+            services.AddScoped<UserService>();
+            services.AddScoped<INoteService, NoteService>();
             services.AddScoped<QuestionService>();
-            services.AddScoped<NoteService>();
+            services.AddScoped<CourseService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, UserManager<User> userManager, RoleManager<Role> roleManager)
@@ -106,7 +103,7 @@ namespace CheckNoteNet5.Server
                 endpoints.MapDefaultControllerRoute();
                 endpoints.MapRazorPages();
                 endpoints.MapControllers();
-                endpoints.MapFallbackToPage("/Index");
+                endpoints.MapFallbackToPage("/_Host");
             });
 
             if (!roleManager.RoleExistsAsync(Role.Admin).Result)

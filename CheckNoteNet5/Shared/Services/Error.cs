@@ -1,11 +1,7 @@
-﻿using CheckNoteNet5.Shared;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace CheckNoteNet5.Server.Services
+namespace CheckNoteNet5.Shared.Services
 {
     public class Error
     {
@@ -25,8 +21,6 @@ namespace CheckNoteNet5.Server.Services
             ErrorCode = errorCode;
             StatusCode = statusCode;
         }
-
-        public static Error Create() => new Error();
     }
 
     public class DevError : Error
