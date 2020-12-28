@@ -33,21 +33,20 @@ namespace CheckNoteNet5.Server.Services
         public async Task<ServiceResult<Question.Model>> Add(Question question)
         {
             var model = Convert(question);
-            var result = new ServiceResult<Question.Model>();
 
-            if (model == null) return result.Error<ConflictError>();
+            if (model == null) return ServiceResult<Question.Model>.MakeError<ConflictError>();
 
             await dbContext.Questions.AddAsync(question);
             await dbContext.SaveChangesAsync();
 
-            return result.Ok(model);
+            return ServiceResult.MakeOk(model);
         }
 
         public async Task<ServiceResult<Question.Model>> Get(int id)
         {
             var question = await dbContext.Questions.FindAsync(id);
 
-            return ServiceResult<Question.Model>.Ok(Convert(question)); //!
+            return ServiceResult.NullCheck(Convert(question)); //!
         }
     }
 }

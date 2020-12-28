@@ -23,13 +23,13 @@ namespace CheckNoteNet5.Server.Services
         public async Task<ServiceResult> Login(Login input)
         {
             var user = await userManager.FindByEmailAsync(input.Email);
-            if (user == null) return ServiceResult.Error<NotFoundError>();
+            if (user == null) return ServiceResult.MakeError<NotFoundError>();
 
             var login = await signInManager.PasswordSignInAsync(user, input.Password, false, false);
 
-            if (login.Succeeded) return ServiceResult.Ok();
+            if (login.Succeeded) return ServiceResult.MakeOk();
 
-            return ServiceResult.Error<UnauthorizedError>();
+            return ServiceResult.MakeError<UnauthorizedError>();
         }
 
         public async Task<ServiceResult<User.Model>> Register(Register input)
@@ -46,7 +46,7 @@ namespace CheckNoteNet5.Server.Services
         {
             await signInManager.SignOutAsync();
 
-            return ServiceResult.Ok();
+            return ServiceResult.MakeOk();
         }
 
         public async Task<ServiceResult<string>> Jwt(Login input)

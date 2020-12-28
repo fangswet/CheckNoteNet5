@@ -1,5 +1,6 @@
 ﻿@page "/fetchdata/{id:int}"
-@using CheckNoteNet5.Shared.Services 
+@using CheckNoteNet5.Shared.Services
+@using System.Text.Json
 @inject INoteService NoteService
 
 <h1>Weather forecast</h1>
@@ -15,7 +16,9 @@
     {
         var result = await NoteService.Get(Id);
 
-        Console.WriteLine("result:");
-        Console.WriteLine(result.IsOk);
+        Console.WriteLine("status");
+        Console.WriteLine(result.StatusCode);
+        string value = JsonSerializer.Serialize(result.GetValue());
+        Console.WriteLine(value);
     }
 }

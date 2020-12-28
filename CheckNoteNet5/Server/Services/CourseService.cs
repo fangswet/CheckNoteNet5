@@ -27,12 +27,10 @@ namespace CheckNoteNet5.Server.Services
 
         public async Task<ServiceResult<Course.Entry>> Get(int id)
         {
-            var result = new ServiceResult<Course.Entry>();
-
             var query = dbContext.Questions.Where(q => q.Id == id);
             var question = await mapper.ProjectTo<Course.Entry>(query).FirstOrDefaultAsync();
 
-            return question != null ? result.Ok(question) : result.Error<NotFoundError>();
+            return ServiceResult.NullCheck(question);
         }
 
         public async Task<ServiceResult<Course.Entry>> Add(Course course)

@@ -54,6 +54,7 @@ namespace CheckNoteNet5.Shared.Models
         }
     }
 
+    // ---- //
     //public record Note
     //{
     //public int Id { get; }
@@ -75,5 +76,4 @@ namespace CheckNoteNet5.Shared.Models
     //}
 
     //public record NoteModel(int Id, string Title, string Description, NoteModel Parent, string Text, List<NoteModel> Children);
-    // ---- //
 }

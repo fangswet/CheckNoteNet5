@@ -1,22 +1,27 @@
-﻿using Microsoft.AspNetCore.Http;
-using System;
+﻿using System;
+using System.Net;
 
 namespace CheckNoteNet5.Shared.Services
 {
+    public enum ErrorCode
+    {
+        Dev = 1000
+    }
+
     public class Error
     {
-        public int ErrorCode { get; init; }
-        public int StatusCode { get; init; }
+        public ErrorCode ErrorCode { get; init; }
+        public HttpStatusCode StatusCode { get; init; }
         public string Message { get; init; }
 
-        public Error(int errorCode = default, string message = null, int statusCode = StatusCodes.Status500InternalServerError)
+        public Error(ErrorCode errorCode = default, string message = null, HttpStatusCode statusCode = HttpStatusCode.InternalServerError)
         {
             ErrorCode = errorCode;
             Message = message;
             StatusCode = statusCode;
         }
 
-        public Error(int errorCode, int statusCode)
+        public Error(ErrorCode errorCode, HttpStatusCode statusCode)
         {
             ErrorCode = errorCode;
             StatusCode = statusCode;
@@ -25,31 +30,37 @@ namespace CheckNoteNet5.Shared.Services
 
     public class DevError : Error
     {
-        public DevError() : base(ErrorCodes.Dev)
+        public DevError() : base(ErrorCode.Dev)
         { }
     }
 
     public class NotFoundError : Error
     {
-        public NotFoundError() : base(default, StatusCodes.Status404NotFound)
+        public NotFoundError() : base(default, HttpStatusCode.NotFound)
         { }
     }
 
     public class TeapotError : Error
     {
-        public TeapotError() : base(default, "test", StatusCodes.Status418ImATeapot)
+        public TeapotError() : base(default, "test", HttpStatusCode.SeeOther)
         { }
     }
 
     public class UnauthorizedError : Error
     {
-        public UnauthorizedError() : base(default, StatusCodes.Status401Unauthorized)
+        public UnauthorizedError() : base(default, HttpStatusCode.Unauthorized)
         { }
     }
 
     public class ConflictError : Error
     {
-        public ConflictError() : base(default, StatusCodes.Status409Conflict)
+        public ConflictError() : base(default, HttpStatusCode.Conflict)
+        { }
+    }
+
+    public class BadRequestError : Error
+    {
+        public BadRequestError() : base(default, HttpStatusCode.BadRequest)
         { }
     }
 
@@ -57,5 +68,8 @@ namespace CheckNoteNet5.Shared.Services
     {
         public static readonly Type Dev = typeof(DevError);
         public static readonly Type NotFound = typeof(NotFoundError);
+        public static readonly Type Unauthorized = typeof(UnauthorizedError);
+        public static readonly Type Conflict = typeof(ConflictError);
+        public static readonly Type BadRequest = typeof(BadRequestError);
     }
 }

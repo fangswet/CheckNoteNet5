@@ -7,8 +7,8 @@ namespace CheckNoteNet5.Server.Controllers
 {
     public class CheckNoteController : ControllerBase
     {
+        // try delegate
         protected static async Task<ActionResult> ServiceAction(Task<ServiceResult> sr) => (await sr).MapToAction();
         protected static async Task<ActionResult<T>> ServiceAction<T>(Task<ServiceResult<T>> sr) => (await sr).MapToAction();
-        protected static async Task<ActionResult<T>> ServiceAction<T>(Task<ServiceError<T>> se) => (await se).MapToAction();
     }
 }

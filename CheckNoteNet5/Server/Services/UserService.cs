@@ -20,11 +20,10 @@ namespace CheckNoteNet5.Server.Services
 
         public async Task<ServiceResult<User.Model>> Get(int id)
         {
-            var result = new ServiceResult<User.Model>();
             var query = dbContext.Users.Where(u => u.Id == id);
             var user = await mapper.ProjectTo<User.Model>(query).FirstOrDefaultAsync();
 
-            return user != null ? result.Ok(user) : result.Error<NotFoundError>();
+            return ServiceResult.NullCheck(user);
         }
     }
 }

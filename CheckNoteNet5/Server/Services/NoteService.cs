@@ -25,10 +25,28 @@ namespace CheckNoteNet5.Server.Services
             httpContext = httpContextAccessor.HttpContext;
         }
 
+        // currently only the properties included in Input type are validated
+        // meaning if you allow for the input of the Note entity in a controller and pass it to this method
+        // it will fuck up the application
+        // consider extending the entities with validation logic to relieve services from the responsibility
         public async Task<ServiceResult<Note.Model>> Add(Note note)
         {
-            //note.Author = await userManager.GetUserAsync(httpContext.User);
-            note.AuthorId = 1;
+            var user = await userManager.GetUserAsync(httpContext.User);
+
+            if (user == null) return ServiceResult<Note.Model>.MakeError<BadRequestError>();
+
+            if (note.ParentId != null)
+            {
+                var parent = await dbContext.Notes.FindAsync(note.ParentId);
+
+                if (parent == null && parent.AuthorId != user.Id)
+                {
+                    return ServiceResult<Note.Model>.MakeError<UnauthorizedError>();
+                }
+            }
+
+            note.AuthorId = user.Id;
+
             await dbContext.Notes.AddAsync(note);
             await dbContext.SaveChangesAsync();
 
@@ -37,11 +55,10 @@ namespace CheckNoteNet5.Server.Services
 
         public async Task<ServiceResult<Note.Model>> Get(int id)
         {
-            var result = new ServiceResult<Note.Model>();
             var query = dbContext.Notes.Where(n => n.Id == id);
             var note = await mapper.ProjectTo<Note.Model>(query).FirstOrDefaultAsync();
 
-            return note != null ? result.Ok(note) : result.Error<NotFoundError>(); // check if returning an implicit null form the controller is 404
+            return ServiceResult.NullCheck(note);
         }
     }
 }
