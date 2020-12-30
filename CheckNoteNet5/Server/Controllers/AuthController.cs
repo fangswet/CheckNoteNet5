@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace CheckNoteNet5.Server.Controllers
 {
-    [AllowAnonymous]
     [ApiController]
     [Route("api/[action]")]
     public class AuthController : ControllerBase

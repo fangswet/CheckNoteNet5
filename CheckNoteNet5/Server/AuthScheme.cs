@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace CheckNoteNet5.Server
 {
     public static class AuthScheme
     {
         public const string Jwt = JwtBearerDefaults.AuthenticationScheme;
-        public const string All = Jwt + ",Identity.Application"; // IdentityConstants.ApplicationScheme
+        public const string Cookie = CookieAuthenticationDefaults.AuthenticationScheme;
+        public const string All = Jwt + "," + Cookie;
     }
 }

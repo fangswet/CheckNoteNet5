@@ -20,12 +20,6 @@ namespace CheckNoteNet5.Shared.Services
             Message = message;
             StatusCode = statusCode;
         }
-
-        public Error(ErrorCode errorCode, HttpStatusCode statusCode)
-        {
-            ErrorCode = errorCode;
-            StatusCode = statusCode;
-        }
     }
 
     public class DevError : Error
@@ -36,7 +30,7 @@ namespace CheckNoteNet5.Shared.Services
 
     public class NotFoundError : Error
     {
-        public NotFoundError() : base(default, HttpStatusCode.NotFound)
+        public NotFoundError() : base(statusCode: HttpStatusCode.NotFound)
         { }
     }
 
@@ -48,19 +42,19 @@ namespace CheckNoteNet5.Shared.Services
 
     public class UnauthorizedError : Error
     {
-        public UnauthorizedError() : base(default, HttpStatusCode.Unauthorized)
+        public UnauthorizedError() : base(statusCode: HttpStatusCode.Unauthorized)
         { }
     }
 
     public class ConflictError : Error
     {
-        public ConflictError() : base(default, HttpStatusCode.Conflict)
+        public ConflictError() : base(statusCode: HttpStatusCode.Conflict)
         { }
     }
 
     public class BadRequestError : Error
     {
-        public BadRequestError() : base(default, HttpStatusCode.BadRequest)
+        public BadRequestError() : base(statusCode: HttpStatusCode.BadRequest)
         { }
     }
 

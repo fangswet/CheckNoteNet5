@@ -1,18 +1,17 @@
 using AutoMapper;
 using CheckNoteNet5.Server.Services;
-using CheckNoteNet5.Shared.Models;
 using CheckNoteNet5.Shared.Models.Auth;
 using CheckNoteNet5.Shared.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Net.Http;
 using System.Text;
 
 namespace CheckNoteNet5.Server
@@ -26,36 +25,25 @@ namespace CheckNoteNet5.Server
 
         public IConfiguration Configuration { get; }
 
-        public record Test1(int Id, string Text, bool Sex);
-        public record Test2(int Id, string Text);
-
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<CheckNoteContext>();
             services.AddHttpContextAccessor();
 
-            services.AddIdentity<User, Role>(config =>
-            {
-                // development
-                config.Password.RequiredLength = 4;
-                config.Password.RequireDigit = false;
-                config.Password.RequireNonAlphanumeric = false;
-                config.Password.RequireUppercase = false;
-            })
-                .AddEntityFrameworkStores<CheckNoteContext>()
+            services.AddIdentityCore<User>()
                 .AddRoles<Role>()
-                .AddDefaultTokenProviders();
+                .AddSignInManager()
+                .AddDefaultTokenProviders()
+                .AddEntityFrameworkStores<CheckNoteContext>();
 
-            services.AddAuthentication(config =>
-            {
-                config.RequireAuthenticatedSignIn = false;
-            })
-                .AddJwtBearer(config =>
+            services.AddAuthentication(AuthScheme.Cookie)
+                .AddCookie() // how the fuck do I configure this? for example the login path? shit is starting to get ridiculous
+                // outsource configuration
+                .AddJwtBearer(options =>
                 {
-                    config.RequireHttpsMetadata = false; // development
-                    config.SaveToken = true;
+                    options.RequireHttpsMetadata = false; // development
 
-                    config.TokenValidationParameters = new TokenValidationParameters
+                    options.TokenValidationParameters = new TokenValidationParameters
                     {
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"])),
                         RequireAudience = false,
@@ -64,7 +52,10 @@ namespace CheckNoteNet5.Server
                     };
                 });
 
-            services.ConfigureApplicationCookie(options => options.LoginPath = "/");
+            services.AddAuthorization(options =>
+            {
+                options.FallbackPolicy = new AuthorizationPolicyBuilder().RequireAssertion(_ => true).Build();
+            });
 
             services.AddControllersWithViews();
             services.AddRazorPages();
@@ -97,6 +88,8 @@ namespace CheckNoteNet5.Server
             app.UseStaticFiles();
 
             app.UseRouting();
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
@@ -105,6 +98,8 @@ namespace CheckNoteNet5.Server
                 endpoints.MapControllers();
                 endpoints.MapFallbackToPage("/_Host");
             });
+
+            // move this
 
             if (!roleManager.RoleExistsAsync(Role.Admin).Result)
             {

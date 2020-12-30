@@ -24,5 +24,9 @@
     <ProjectReference Include="..\Shared\CheckNoteNet5.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
 
 </Project>

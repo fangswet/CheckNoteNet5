@@ -44,13 +44,19 @@ namespace CheckNoteNet5.Shared.Services
 
         public static async Task<ServiceResult<T>> Parse(HttpResponseMessage response)
         {
+            var content = await response.Content.ReadAsByteArrayAsync();
+
             if (response.IsSuccessStatusCode)
             {
-                var note = await response.Content.ReadFromJsonAsync<T>();
-                return MakeOk(note);
+                if (content.Length > 0)
+                {
+                    var result = await response.Content.ReadFromJsonAsync<T>();
+                    return MakeOk(result);
+                }
+
+                return new ServiceResult<T>(statusCode: response.StatusCode);
             }
 
-            var content = await response.Content.ReadAsByteArrayAsync();
             var error = content.Length > 0 ? JsonSerializer.Deserialize<Error>(content) : new Error(statusCode: response.StatusCode);
 
             return new ServiceResult<T>(error);

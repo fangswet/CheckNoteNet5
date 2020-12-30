@@ -33,6 +33,7 @@ namespace CheckNoteNet5.Server.Services
         {
             var user = await userManager.GetUserAsync(httpContext.User);
 
+            // dont check for no user here 
             if (user == null) return ServiceResult<Note.Model>.MakeError<BadRequestError>();
 
             if (note.ParentId != null)

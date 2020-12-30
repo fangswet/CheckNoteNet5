@@ -1,24 +1,28 @@
 ﻿@page "/fetchdata/{id:int}"
+@using CheckNoteNet5.Shared.Models
 @using CheckNoteNet5.Shared.Services
-@using System.Text.Json
 @inject INoteService NoteService
 
-<h1>Weather forecast</h1>
+<p @ref="testReference"></p>
 
-<p>This component demonstrates fetching data from the server.</p>
-
-@code 
-{ 
+@code
+{
     [Parameter]
     public int Id { get; set; }
+    private string flash;
+    ElementReference testReference;
 
+    // try setting a flag or smth because it really does fire twice without a fucking reason
     protected override async Task OnInitializedAsync()
     {
-        var result = await NoteService.Get(Id);
+        // i need to call some function that manually updates html content and not rely on a property
+        await Task.Delay(3000);
+    }
 
-        Console.WriteLine("status");
-        Console.WriteLine(result.StatusCode);
-        string value = JsonSerializer.Serialize(result.GetValue());
-        Console.WriteLine(value);
+    private async void Add()
+    {
+        //var result = await NoteService.Add(addNote);
+
+        //if (result.IsOk) addedTitle = result.Value.Title;
     }
 }
