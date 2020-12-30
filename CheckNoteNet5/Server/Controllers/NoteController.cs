@@ -1,4 +1,5 @@
-﻿using CheckNoteNet5.Shared.Models;
+﻿using CheckNoteNet5.Server.Services.Extensions;
+using CheckNoteNet5.Shared.Models;
 using CheckNoteNet5.Shared.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -6,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace CheckNoteNet5.Server.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
-    public class NoteController : CheckNoteController
+    [Authorize]
+    public class NoteController
     {
         private readonly INoteService noteService;
 
@@ -18,11 +19,11 @@ namespace CheckNoteNet5.Server.Controllers
             this.noteService = noteService;
         }
 
-        [AllowAnonymous]
         [Route("{id}")]
-        public async Task<ActionResult<Note.Model>> Get(int id) => await ServiceAction(noteService.Get(id));
+        [AllowAnonymous]
+        public async Task<ActionResult<Note.Model>> Get(int id) => await noteService.Get(id).MapToAction();
 
         [HttpPost]
-        public async Task<ActionResult<Note.Model>> Add(Note.Input note) => await ServiceAction(noteService.Add(note));
+        public async Task<ActionResult<Note.Model>> Add(Note.Input note) => await noteService.Add(note).MapToAction();
     }
 }

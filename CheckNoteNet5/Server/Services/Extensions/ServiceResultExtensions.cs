@@ -1,5 +1,6 @@
 ﻿using CheckNoteNet5.Shared.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace CheckNoteNet5.Server.Services.Extensions
 {
@@ -11,5 +12,8 @@ namespace CheckNoteNet5.Server.Services.Extensions
             {
                 StatusCode = (int) sr.StatusCode
             };
+
+        public static async Task<ActionResult> MapToAction(this Task<ServiceResult> sr) => (await sr).MapToAction();
+        public static async Task<ActionResult<T>> MapToAction<T>(this Task<ServiceResult<T>> sr) => (await sr).MapToAction();
     }
 }

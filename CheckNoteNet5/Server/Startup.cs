@@ -2,6 +2,7 @@ using AutoMapper;
 using CheckNoteNet5.Server.Services;
 using CheckNoteNet5.Shared.Models.Auth;
 using CheckNoteNet5.Shared.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -36,9 +37,16 @@ namespace CheckNoteNet5.Server
                 .AddDefaultTokenProviders()
                 .AddEntityFrameworkStores<CheckNoteContext>();
 
-            services.AddAuthentication(AuthScheme.Cookie)
-                .AddCookie() // how the fuck do I configure this? for example the login path? shit is starting to get ridiculous
+            services.AddAuthentication()
                 // outsource configuration
+                .AddCookie(options =>
+                {
+                    options.Events = new CookieAuthenticationEvents
+                    {
+                        OnRedirectToLogin = async context => context.Response.StatusCode = 401,
+                        OnRedirectToAccessDenied = async context => context.Response.StatusCode = 403
+                    };
+                })
                 .AddJwtBearer(options =>
                 {
                     options.RequireHttpsMetadata = false; // development
@@ -52,9 +60,19 @@ namespace CheckNoteNet5.Server
                     };
                 });
 
+            // support multiple schemes
             services.AddAuthorization(options =>
             {
-                options.FallbackPolicy = new AuthorizationPolicyBuilder().RequireAssertion(_ => true).Build();
+                var cookiePolicy = new AuthorizationPolicyBuilder(CookieAuthenticationDefaults.AuthenticationScheme)
+                    .RequireAuthenticatedUser().Build();
+
+                var jwtPolicy = new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
+                    .RequireAuthenticatedUser().Build();
+
+                options.AddPolicy(Policy.Cookie, cookiePolicy);
+                options.AddPolicy(Policy.Jwt, jwtPolicy);
+                // one day we will be able to set FallbackPolicy
+                options.DefaultPolicy = new AuthorizationPolicyBuilder().Combine(cookiePolicy).Combine(jwtPolicy).Build();
             });
 
             services.AddControllersWithViews();
