@@ -16,13 +16,15 @@ namespace CheckNoteNet5.Shared.Models
         [Required]
         public QuestionType Type { get; set; }
         public bool? Correct { get; set; }
-        public QuestionDifficulty Difficulty { get; set; } = QuestionDifficulty.Easy;
+        [Required]
+        public QuestionDifficulty Difficulty { get; set; }
         public virtual ICollection<Answer> Answers { get; init; }
+        public virtual ICollection<Tag> Tags { get; init; }
 
         public Question()
         { }
 
-        public Question(string title, QuestionType type, Note note)
+        protected Question(string title, QuestionType type, Note note)
         {
             Title = title;
             Type = type;
@@ -38,6 +40,29 @@ namespace CheckNoteNet5.Shared.Models
             public string Text { get; init; }
             public QuestionType Type { get; init; }
             public QuestionDifficulty Difficulty { get; init; }
+        }
+
+        public class Input
+        {
+            [Required]
+            [MinLength(10)]
+            public string Title { get; set; } // could be init?
+            public string Text { get; set; }
+            public QuestionType Type { get; init; } = QuestionType.Binary;
+            public QuestionDifficulty Difficulty { get; init; } = QuestionDifficulty.Easy;
+            public bool Correct { get; init; }
+            public List<Answer.Input> Answers { get; } = new List<Answer.Input>();
+
+            public static explicit operator Question(Input i) 
+                => new Question
+                {
+                    Title = i.Title,
+                    Text = i.Text,
+                    Type = i.Type,
+                    Difficulty = i.Difficulty,
+                    Correct = i.Correct,
+                    Answers = i.Answers.ConvertAll(ai => (Answer)ai)
+                };
         }
 
         public class BinaryModel : Model

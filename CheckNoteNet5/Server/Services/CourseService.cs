@@ -13,15 +13,13 @@ namespace CheckNoteNet5.Server.Services
     public class CourseService
     {
         private readonly CheckNoteContext dbContext;
-        private readonly UserManager<User> userManager;
-        private readonly HttpContext httpContext;
+        private readonly AuthService authService;
         private readonly IMapper mapper;
 
-        public CourseService(CheckNoteContext dbContext, UserManager<User> userManager, IHttpContextAccessor httpContextAccessor, IMapper mapper)
+        public CourseService(CheckNoteContext dbContext, AuthService authService, IMapper mapper)
         {
             this.dbContext = dbContext;
-            this.userManager = userManager;
-            httpContext = httpContextAccessor.HttpContext;
+            this.authService = authService;
             this.mapper = mapper;
         }
 
@@ -35,8 +33,7 @@ namespace CheckNoteNet5.Server.Services
 
         public async Task<ServiceResult<Course.Entry>> Add(Course course)
         {
-            var user = await userManager.GetUserAsync(httpContext.User);
-            course.AuthorId = user.Id;
+            course.AuthorId = (int)authService.UserId; // caution implied that authorization is in place
 
             await dbContext.Courses.AddAsync(course);
             await dbContext.SaveChangesAsync();

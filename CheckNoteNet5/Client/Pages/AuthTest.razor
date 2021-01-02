@@ -1,0 +1,24 @@
+﻿@page "/login" 
+
+@using CheckNoteNet5.Shared.Models.Auth
+@using CheckNoteNet5.Shared.Services
+@inject IAuthService AuthService
+@inject NavigationManager NavigationManager
+
+<EditForm Model="@credentials" OnValidSubmit="@Login">
+    <InputText @bind-Value="@credentials.Email" type="email" />
+    <InputText @bind-Value="@credentials.Password" type="password" />
+    <button type="submit">Login</button>
+</EditForm>
+
+@code
+{
+    private Login credentials = new Login { Email = "admin@admin.com", Password = "admin" };
+
+    private async Task Login()
+    {
+        var result = await AuthService.Login(credentials);
+
+        if (result.IsOk) NavigationManager.NavigateTo("/");
+    }
+}

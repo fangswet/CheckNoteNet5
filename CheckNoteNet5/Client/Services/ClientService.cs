@@ -20,7 +20,6 @@ namespace CheckNoteNet5.Client.Services
         {
             factory.SlidingExpiration = TimeSpan.FromSeconds(5);
 
-            // should this be awaited? idk
             return action(factory);
         });
         protected static async Task<ServiceResult<T>> Parse<T>(HttpResponseMessage response) => await ServiceResult<T>.Parse(response);

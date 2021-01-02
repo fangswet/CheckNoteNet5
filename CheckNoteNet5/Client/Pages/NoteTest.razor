@@ -1,0 +1,63 @@
+﻿@page "/note/{id:int}"
+@using CheckNoteNet5.Shared.Models
+@inject CheckNoteNet5.Shared.Services.INoteService NoteService
+
+<h3>id: @Id</h3>
+
+<p>title: @note?.Title</p>
+<p>description: @note?.Description</p>
+<p>text: @note?.Text</p>
+<p>author: @note?.Author?.UserName</p>
+
+<div>
+    add note
+    <EditForm Model="@newNote" OnValidSubmit="@Add">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <p>
+            <label>
+                title:
+                <InputText @bind-Value="newNote.Title" />
+            </label>
+        </p>
+        <p>
+            <label>
+                description (optional):
+                <InputText @bind-Value="newNote.Description" />
+            </label>
+        </p>
+        <p>
+            <label>
+                text:
+                <InputText @bind-Value="newNote.Text" />
+            </label>
+        </p>
+        <button type="submit">add</button>
+    </EditForm>
+</div>
+
+@code
+{
+    [Parameter]
+    public int Id { get; set; }
+    private Note.Model note;
+    private Note.Input newNote = new Note.Input();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await NoteService.Get(Id);
+
+        note = result.Value;
+    }
+
+    private async Task Add()
+    {
+        var result = await NoteService.Add(newNote);
+
+        if (result.IsOk)
+        {
+            note = result.Value;
+            newNote = new Note.Input();
+        }
+    }
+}

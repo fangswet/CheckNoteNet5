@@ -22,6 +22,15 @@ namespace CheckNoteNet5.Shared.Models
                 public string Text { get; init; }
                 public int QuestionId { get; init; }
             }
+
+            public class Input
+            {
+                [Required]
+                public string Text { get; init; }
+                public bool? Correct { get; init; }
+
+                public static explicit operator Answer(Input i) => new Answer { Text = i.Text, Correct = i.Correct };
+            }
         }
     }
 }

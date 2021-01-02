@@ -1,5 +1,6 @@
 using AutoMapper;
 using CheckNoteNet5.Server.Services;
+using CheckNoteNet5.Server.Services.ServiceItems;
 using CheckNoteNet5.Shared.Models.Auth;
 using CheckNoteNet5.Shared.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -31,7 +32,13 @@ namespace CheckNoteNet5.Server
             services.AddDbContext<CheckNoteContext>();
             services.AddHttpContextAccessor();
 
-            services.AddIdentityCore<User>()
+            services.AddIdentityCore<User>(options =>
+            {
+                options.Password.RequiredLength = 4;
+                options.Password.RequireDigit = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+            })
                 .AddRoles<Role>()
                 .AddSignInManager()
                 .AddDefaultTokenProviders()
@@ -39,7 +46,7 @@ namespace CheckNoteNet5.Server
 
             services.AddAuthentication()
                 // outsource configuration
-                .AddCookie(options =>
+                .AddCookie(IdentityConstants.ApplicationScheme, options =>
                 {
                     options.Events = new CookieAuthenticationEvents
                     {
@@ -63,7 +70,7 @@ namespace CheckNoteNet5.Server
             // support multiple schemes
             services.AddAuthorization(options =>
             {
-                var cookiePolicy = new AuthorizationPolicyBuilder(CookieAuthenticationDefaults.AuthenticationScheme)
+                var cookiePolicy = new AuthorizationPolicyBuilder(IdentityConstants.ApplicationScheme)
                     .RequireAuthenticatedUser().Build();
 
                 var jwtPolicy = new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
@@ -71,7 +78,6 @@ namespace CheckNoteNet5.Server
 
                 options.AddPolicy(Policy.Cookie, cookiePolicy);
                 options.AddPolicy(Policy.Jwt, jwtPolicy);
-                // one day we will be able to set FallbackPolicy
                 options.DefaultPolicy = new AuthorizationPolicyBuilder().Combine(cookiePolicy).Combine(jwtPolicy).Build();
             });
 
@@ -81,11 +87,13 @@ namespace CheckNoteNet5.Server
             services.AddAutoMapper(typeof(Startup));
 
             services.AddScoped<JwtService>();
+            services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<AuthService>();
             services.AddScoped<UserService>();
             services.AddScoped<INoteService, NoteService>();
             services.AddScoped<QuestionService>();
             services.AddScoped<CourseService>();
+            services.AddScoped<TagService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, UserManager<User> userManager, RoleManager<Role> roleManager)

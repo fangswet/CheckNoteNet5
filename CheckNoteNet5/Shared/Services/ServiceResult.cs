@@ -1,5 +1,4 @@
-﻿using CheckNoteNet5.Shared.Models;
-using System.Net;
+﻿using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -10,8 +9,9 @@ namespace CheckNoteNet5.Shared.Services
     public class ServiceResult
     {
         public Error error;
-        private HttpStatusCode statusCode;
         public bool IsOk { get => error == null; }
+
+        public HttpStatusCode statusCode;
         public HttpStatusCode StatusCode 
         { 
             get => IsOk ? statusCode : error.StatusCode; 
@@ -27,12 +27,32 @@ namespace CheckNoteNet5.Shared.Services
         public static ServiceResult MakeError<E>(string message) where E : Error, new() => new ServiceResult(new E { Message = message });
         public static ServiceResult<T> NullCheck<T>(T value) where T : class 
             => value == null ? ServiceResult<T>.MakeError<NotFoundError>() : MakeOk(value);
+
+        public static async Task<ServiceResult> Parse(HttpResponseMessage response)
+        {
+            var content = await response.Content.ReadAsByteArrayAsync();
+
+            if (response.IsSuccessStatusCode) 
+                return new ServiceResult(statusCode: response.StatusCode);
+
+            var error = content.Length > 0 ? JsonSerializer.Deserialize<Error>(content) : new Error(statusCode: response.StatusCode);
+
+            return new ServiceResult(error);
+        }
+
+        public static implicit operator ServiceResult(HttpResponseMessage response) => Parse(response).Result;
     }
 
     public class ServiceResult<T> : ServiceResult
     {
-        public T Value { get; set; }
-        public dynamic GetValue() => IsOk ? Value : error;
+        //maybe add a way to detect if value set
+        private T _value { get; set; }
+        public bool hasValue = false;
+        public T Value
+        {
+            get => _value;
+            set { hasValue = true; _value = value; }
+        }
 
         public ServiceResult(T value = default, HttpStatusCode statusCode = HttpStatusCode.OK) : base(statusCode) => Value = value;
         public ServiceResult(Error error) : base(error) { }
@@ -42,7 +62,7 @@ namespace CheckNoteNet5.Shared.Services
         public ServiceResult<T> Error<E>() where E : Error, new() => new ServiceResult<T>(new E());
         public ServiceResult<T> Error<E>(string message) where E : Error, new() => new ServiceResult<T>(new E { Message = message });
 
-        public static async Task<ServiceResult<T>> Parse(HttpResponseMessage response)
+        public new static async Task<ServiceResult<T>> Parse(HttpResponseMessage response)
         {
             var content = await response.Content.ReadAsByteArrayAsync();
 
@@ -61,5 +81,7 @@ namespace CheckNoteNet5.Shared.Services
 
             return new ServiceResult<T>(error);
         }
+
+        public static implicit operator ServiceResult<T>(HttpResponseMessage response) => Parse(response).Result;
     }
 }

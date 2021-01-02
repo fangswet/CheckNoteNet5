@@ -32,10 +32,27 @@ namespace CheckNoteNet5.Server
             builder.Entity<Note>(note =>
             {
                 note.HasOne(n => n.Parent).WithMany(n => n.Children).OnDelete(DeleteBehavior.Restrict);
-                note.HasMany(n => n.Courses).WithMany(c => c.Notes).UsingEntity<Dictionary<string, object>>(
+                note.HasMany(n => n.Courses).WithMany(c => c.Notes).UsingEntity<Dictionary<string, object>>
+                (
                     "CourseNotes",
                     j => j.HasOne<Course>().WithMany().HasForeignKey("CourseId").OnDelete(DeleteBehavior.Restrict),
                     j => j.HasOne<Note>().WithMany().HasForeignKey("NoteId").OnDelete(DeleteBehavior.Restrict)
+                );
+            });
+
+            builder.Entity<Tag>(tag =>
+            {
+                tag.HasMany(t => t.Notes).WithMany(n => n.Tags).UsingEntity<Dictionary<string, object>>
+                (
+                    "NoteTags",
+                    j => j.HasOne<Note>().WithMany().HasForeignKey("NoteId").OnDelete(DeleteBehavior.Restrict),
+                    j => j.HasOne<Tag>().WithMany().HasForeignKey("TagId").OnDelete(DeleteBehavior.Restrict)
+                );
+                tag.HasMany(t => t.Questions).WithMany(n => n.Tags).UsingEntity<Dictionary<string, object>>
+                (
+                    "QuestionTags",
+                    j => j.HasOne<Question>().WithMany().HasForeignKey("QuestionId").OnDelete(DeleteBehavior.Restrict),
+                    j => j.HasOne<Tag>().WithMany().HasForeignKey("TagId").OnDelete(DeleteBehavior.Restrict)
                 );
             });
 
@@ -60,5 +77,6 @@ namespace CheckNoteNet5.Server
         public DbSet<Note> Notes { get; set; }
         public DbSet<Question> Questions { get; set; }
         public DbSet<Course> Courses { get; set; }
+        public DbSet<Tag> Tags { get; set; }
     }
 }

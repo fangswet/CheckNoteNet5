@@ -1,7 +1,6 @@
 ﻿using CheckNoteNet5.Server.Services;
 using CheckNoteNet5.Server.Services.Extensions;
 using CheckNoteNet5.Shared.Models.Auth;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -9,7 +8,7 @@ namespace CheckNoteNet5.Server.Controllers
 {
     [ApiController]
     [Route("api/[action]")]
-    public class AuthController
+    public class AuthController : ControllerBase
     {
         private readonly AuthService authService;
 

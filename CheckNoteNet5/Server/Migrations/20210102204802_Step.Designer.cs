@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CheckNoteNet5.Server.Migrations
 {
     [DbContext(typeof(CheckNoteContext))]
-    [Migration("20201221203240_Step")]
+    [Migration("20210102204802_Step")]
     partial class Step
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -48,6 +48,73 @@ namespace CheckNoteNet5.Server.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles");
+                });
+
+            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Auth.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex")
+                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.ToTable("AspNetUsers");
                 });
 
             modelBuilder.Entity("CheckNoteNet5.Shared.Models.Course", b =>
@@ -117,9 +184,6 @@ namespace CheckNoteNet5.Server.Migrations
                     b.Property<int>("ContentId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("CourseId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
@@ -136,8 +200,6 @@ namespace CheckNoteNet5.Server.Migrations
 
                     b.HasIndex("ContentId");
 
-                    b.HasIndex("CourseId");
-
                     b.HasIndex("ParentId");
 
                     b.ToTable("Notes");
@@ -145,7 +207,7 @@ namespace CheckNoteNet5.Server.Migrations
 
             modelBuilder.Entity("CheckNoteNet5.Shared.Models.Note+ContentDto", b =>
                 {
-                    b.Property<int>("NoteId")
+                    b.Property<int?>("NoteId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .UseIdentityColumn();
@@ -216,71 +278,20 @@ namespace CheckNoteNet5.Server.Migrations
                     b.ToTable("Answers");
                 });
 
-            modelBuilder.Entity("CheckNoteNet5.Shared.Models.User", b =>
+            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Tag", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
-                    b.Property<int>("AccessFailedCount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
+                    b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("NormalizedEmail")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("NormalizedUserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("PasswordHash")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("SecurityStamp")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("UserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("NormalizedEmail")
-                        .HasDatabaseName("EmailIndex");
-
-                    b.HasIndex("NormalizedUserName")
-                        .IsUnique()
-                        .HasDatabaseName("UserNameIndex")
-                        .HasFilter("[NormalizedUserName] IS NOT NULL");
-
-                    b.ToTable("AspNetUsers");
+                    b.ToTable("Tags");
                 });
 
             modelBuilder.Entity("CourseLikes", b =>
@@ -296,6 +307,21 @@ namespace CheckNoteNet5.Server.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("CourseLikes");
+                });
+
+            modelBuilder.Entity("CourseNotes", b =>
+                {
+                    b.Property<int?>("CourseId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoteId")
+                        .HasColumnType("int");
+
+                    b.HasKey("CourseId", "NoteId");
+
+                    b.HasIndex("NoteId");
+
+                    b.ToTable("CourseNotes");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -399,9 +425,39 @@ namespace CheckNoteNet5.Server.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
+            modelBuilder.Entity("NoteTags", b =>
+                {
+                    b.Property<int?>("NoteId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TagId")
+                        .HasColumnType("int");
+
+                    b.HasKey("NoteId", "TagId");
+
+                    b.HasIndex("TagId");
+
+                    b.ToTable("NoteTags");
+                });
+
+            modelBuilder.Entity("QuestionTags", b =>
+                {
+                    b.Property<int?>("QuestionId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TagId")
+                        .HasColumnType("int");
+
+                    b.HasKey("QuestionId", "TagId");
+
+                    b.HasIndex("TagId");
+
+                    b.ToTable("QuestionTags");
+                });
+
             modelBuilder.Entity("CheckNoteNet5.Shared.Models.Course", b =>
                 {
-                    b.HasOne("CheckNoteNet5.Shared.Models.User", "Author")
+                    b.HasOne("CheckNoteNet5.Shared.Models.Auth.User", "Author")
                         .WithMany("Courses")
                         .HasForeignKey("AuthorId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -418,7 +474,7 @@ namespace CheckNoteNet5.Server.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("CheckNoteNet5.Shared.Models.User", "User")
+                    b.HasOne("CheckNoteNet5.Shared.Models.Auth.User", "User")
                         .WithMany("TestResults")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -431,7 +487,7 @@ namespace CheckNoteNet5.Server.Migrations
 
             modelBuilder.Entity("CheckNoteNet5.Shared.Models.Note", b =>
                 {
-                    b.HasOne("CheckNoteNet5.Shared.Models.User", "Author")
+                    b.HasOne("CheckNoteNet5.Shared.Models.Auth.User", "Author")
                         .WithMany("Notes")
                         .HasForeignKey("AuthorId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -443,13 +499,10 @@ namespace CheckNoteNet5.Server.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CheckNoteNet5.Shared.Models.Course", null)
-                        .WithMany("Notes")
-                        .HasForeignKey("CourseId");
-
                     b.HasOne("CheckNoteNet5.Shared.Models.Note", "Parent")
                         .WithMany("Children")
-                        .HasForeignKey("ParentId");
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Author");
 
@@ -461,7 +514,7 @@ namespace CheckNoteNet5.Server.Migrations
             modelBuilder.Entity("CheckNoteNet5.Shared.Models.Question", b =>
                 {
                     b.HasOne("CheckNoteNet5.Shared.Models.Note", "Note")
-                        .WithMany()
+                        .WithMany("Questions")
                         .HasForeignKey("NoteId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -482,7 +535,7 @@ namespace CheckNoteNet5.Server.Migrations
 
             modelBuilder.Entity("CourseLikes", b =>
                 {
-                    b.HasOne("CheckNoteNet5.Shared.Models.User", null)
+                    b.HasOne("CheckNoteNet5.Shared.Models.Auth.User", null)
                         .WithMany()
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -491,6 +544,21 @@ namespace CheckNoteNet5.Server.Migrations
                     b.HasOne("CheckNoteNet5.Shared.Models.Course", null)
                         .WithMany()
                         .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("CourseNotes", b =>
+                {
+                    b.HasOne("CheckNoteNet5.Shared.Models.Course", null)
+                        .WithMany()
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("CheckNoteNet5.Shared.Models.Note", null)
+                        .WithMany()
+                        .HasForeignKey("NoteId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
@@ -506,7 +574,7 @@ namespace CheckNoteNet5.Server.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<int>", b =>
                 {
-                    b.HasOne("CheckNoteNet5.Shared.Models.User", null)
+                    b.HasOne("CheckNoteNet5.Shared.Models.Auth.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -515,7 +583,7 @@ namespace CheckNoteNet5.Server.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<int>", b =>
                 {
-                    b.HasOne("CheckNoteNet5.Shared.Models.User", null)
+                    b.HasOne("CheckNoteNet5.Shared.Models.Auth.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -530,7 +598,7 @@ namespace CheckNoteNet5.Server.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CheckNoteNet5.Shared.Models.User", null)
+                    b.HasOne("CheckNoteNet5.Shared.Models.Auth.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -539,37 +607,67 @@ namespace CheckNoteNet5.Server.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
                 {
-                    b.HasOne("CheckNoteNet5.Shared.Models.User", null)
+                    b.HasOne("CheckNoteNet5.Shared.Models.Auth.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Course", b =>
+            modelBuilder.Entity("NoteTags", b =>
                 {
-                    b.Navigation("Notes");
+                    b.HasOne("CheckNoteNet5.Shared.Models.Note", null)
+                        .WithMany()
+                        .HasForeignKey("NoteId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
-                    b.Navigation("TestResults");
+                    b.HasOne("CheckNoteNet5.Shared.Models.Tag", null)
+                        .WithMany()
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
-            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Note", b =>
+            modelBuilder.Entity("QuestionTags", b =>
                 {
-                    b.Navigation("Children");
+                    b.HasOne("CheckNoteNet5.Shared.Models.Question", null)
+                        .WithMany()
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("CheckNoteNet5.Shared.Models.Tag", null)
+                        .WithMany()
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
-            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Question", b =>
-                {
-                    b.Navigation("Answers");
-                });
-
-            modelBuilder.Entity("CheckNoteNet5.Shared.Models.User", b =>
+            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Auth.User", b =>
                 {
                     b.Navigation("Courses");
 
                     b.Navigation("Notes");
 
                     b.Navigation("TestResults");
+                });
+
+            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Course", b =>
+                {
+                    b.Navigation("TestResults");
+                });
+
+            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Note", b =>
+                {
+                    b.Navigation("Children");
+
+                    b.Navigation("Questions");
+                });
+
+            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Question", b =>
+                {
+                    b.Navigation("Answers");
                 });
 #pragma warning restore 612, 618
         }

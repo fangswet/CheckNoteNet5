@@ -1,7 +1,7 @@
 ﻿using CheckNoteNet5.Shared.Models.Auth;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
+using System.Linq;
 
 namespace CheckNoteNet5.Shared.Models
 {
@@ -18,25 +18,34 @@ namespace CheckNoteNet5.Shared.Models
         public int? ParentId { get; set; }
         public virtual User Author { get; set; }
         public virtual Note Parent { get; set; }
-        public virtual ContentDto Content { get; set; }
+        public virtual ContentDto Content { get; set; } = new ContentDto();
         public virtual ICollection<Note> Children { get; set; }
         public virtual ICollection<Course> Courses { get; set; }
+        public virtual ICollection<Question> Questions { get; set; }
+        public virtual ICollection<Tag> Tags { get; set; }
 
         public class Input
         {
             [Required]
-            public string Title { get; init; }
-            public string Description { get; init; }
+            [MinLength(5)]
+            public string Title { get; set; }
+            [MinLength(10)]
+            public string Description { get; set; }
             [Required]
-            public string Text { get; init; }
-            public int? ParentId { get; init; }
+            [MinLength(25)]
+            public string Text { get; set; }
+            public int? ParentId { get; set; }
+            public List<Question.Input> Questions { get; init; } = new List<Question.Input>();
+            public List<Tag.Model> Tags { get; init; } = new List<Tag.Model>();
 
             public static implicit operator Note(Input i) => new Note 
             { 
                 Title = i.Title, 
                 Description = i.Description, 
                 ParentId = i.ParentId,
-                Content = new ContentDto { NoteId = null, Text = i.Text }
+                Content = new ContentDto { NoteId = null, Text = i.Text },
+                Questions = i.Questions.ConvertAll(qi => (Question)qi), // does this REALLY have to be converted? who the fuck cares what class this is
+                Tags = i.Tags.ConvertAll(ti => (Tag)ti)
             };
         }
 
@@ -48,9 +57,17 @@ namespace CheckNoteNet5.Shared.Models
             public User.Model Author { get; init; }
             public Model Parent { get; init; }
             public ICollection<Model> Children { get; init; }
-            [JsonIgnore]
-            public ContentDto Content { get; init; }
-            public string Text { get => Content?.Text; }
+            public string Text { get; init; }
+        }
+
+        // could be simplified if I used Include instead of lazy loading (i.e dont include Content)
+        public class Entry
+        {
+            public int Id { get; init; }
+            public string Title { get; init; }
+            public string Description { get; init; }
+            public User.Model Author { get; init; }
+            public List<Tag.Model> Tags { get; init; }
         }
     }
 

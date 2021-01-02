@@ -30,8 +30,9 @@ namespace CheckNoteNet5.Server.Services
             return null;
         }
 
-        public async Task<ServiceResult<Question.Model>> Add(Question question)
+        public async Task<ServiceResult<Question.Model>> Add(Question.Input input)
         {
+            var question = (Question)input;
             var model = Convert(question);
 
             if (model == null) return ServiceResult<Question.Model>.MakeError<ConflictError>();
@@ -46,7 +47,7 @@ namespace CheckNoteNet5.Server.Services
         {
             var question = await dbContext.Questions.FindAsync(id);
 
-            return ServiceResult.NullCheck(Convert(question)); //!
+            return ServiceResult.NullCheck(Convert(question));
         }
     }
 }
