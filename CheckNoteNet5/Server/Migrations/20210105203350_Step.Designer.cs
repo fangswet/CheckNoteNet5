@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CheckNoteNet5.Server.Migrations
 {
     [DbContext(typeof(CheckNoteContext))]
-    [Migration("20210102204802_Step")]
+    [Migration("20210105203350_Step")]
     partial class Step
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -20,6 +20,10 @@ namespace CheckNoteNet5.Server.Migrations
                 .UseIdentityColumns()
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("ProductVersion", "5.0.1");
+
+            modelBuilder.HasSequence<int>("IDSequence")
+                .StartsAt(478261L)
+                .IncrementsBy(12343);
 
             modelBuilder.Entity("CheckNoteNet5.Shared.Models.Auth.Role", b =>
                 {
@@ -176,7 +180,7 @@ namespace CheckNoteNet5.Server.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasDefaultValueSql("NEXT VALUE FOR IDSequence");
 
                     b.Property<int>("AuthorId")
                         .HasColumnType("int");
@@ -186,6 +190,9 @@ namespace CheckNoteNet5.Server.Migrations
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ModifiedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<int?>("ParentId")
                         .HasColumnType("int");

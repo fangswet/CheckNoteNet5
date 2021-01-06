@@ -1,6 +1,9 @@
-﻿using CheckNoteNet5.Shared.Models.Auth;
+﻿using CheckNoteNet5.Shared.Attributes;
+using CheckNoteNet5.Shared.Models.Auth;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 
 namespace CheckNoteNet5.Shared.Models
@@ -16,6 +19,7 @@ namespace CheckNoteNet5.Shared.Models
         [Required]
         public int AuthorId { get; set; }
         public int? ParentId { get; set; }
+        public DateTime ModifiedAt { get; set; }
         public virtual User Author { get; set; }
         public virtual Note Parent { get; set; }
         public virtual ContentDto Content { get; set; } = new ContentDto();
@@ -36,6 +40,7 @@ namespace CheckNoteNet5.Shared.Models
             public string Text { get; set; }
             public int? ParentId { get; set; }
             public List<Question.Input> Questions { get; init; } = new List<Question.Input>();
+            [MaxCount(10)]
             public List<Tag.Model> Tags { get; init; } = new List<Tag.Model>();
 
             public static implicit operator Note(Input i) => new Note 

@@ -7,7 +7,7 @@ namespace CheckNoteNet5.Server.Services.Extensions
     // important asp adds a default error message when there is an error and no value
     public static class ServiceResultExtensions
     {
-        public static ActionResult MapToAction(this Error e) => new ObjectResult(e.Message) { StatusCode = (int)e.StatusCode };
+        public static ActionResult MapToAction(this ServiceError e) => new ObjectResult(e.Message) { StatusCode = (int)e.StatusCode };
         public static ActionResult MapToAction(this ServiceResult sr) =>
             sr.IsOk
             ? new StatusCodeResult((int)sr.statusCode)

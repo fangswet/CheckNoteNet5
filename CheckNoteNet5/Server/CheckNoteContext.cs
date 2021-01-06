@@ -29,8 +29,11 @@ namespace CheckNoteNet5.Server
         {
             base.OnModelCreating(builder);
 
+            builder.HasSequence<int>("IDSequence").StartsAt(478261).IncrementsBy(12343);
+
             builder.Entity<Note>(note =>
             {
+                note.Property(n => n.Id).HasDefaultValueSql("NEXT VALUE FOR IDSequence");
                 note.HasOne(n => n.Parent).WithMany(n => n.Children).OnDelete(DeleteBehavior.Restrict);
                 note.HasMany(n => n.Courses).WithMany(c => c.Notes).UsingEntity<Dictionary<string, object>>
                 (

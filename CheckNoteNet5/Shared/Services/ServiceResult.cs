@@ -8,7 +8,7 @@ namespace CheckNoteNet5.Shared.Services
 {
     public class ServiceResult
     {
-        public Error error;
+        public ServiceError error;
         public bool IsOk { get => error == null; }
 
         public HttpStatusCode statusCode;
@@ -19,12 +19,12 @@ namespace CheckNoteNet5.Shared.Services
         }
 
         public ServiceResult(HttpStatusCode statusCode = HttpStatusCode.OK) => this.statusCode = statusCode;
-        public ServiceResult(Error error) => this.error = error;
+        public ServiceResult(ServiceError error) => this.error = error;
 
         public static ServiceResult MakeOk(HttpStatusCode statusCode = HttpStatusCode.OK) => new ServiceResult(statusCode);
         public static ServiceResult<T> MakeOk<T>(T value = default, HttpStatusCode statusCode = HttpStatusCode.OK) => new ServiceResult<T>(value, statusCode);
-        public static ServiceResult MakeError<E>() where E : Error, new() => new ServiceResult(new E());
-        public static ServiceResult MakeError<E>(string message) where E : Error, new() => new ServiceResult(new E { Message = message });
+        public static ServiceResult MakeError<E>() where E : ServiceError, new() => new ServiceResult(new E());
+        public static ServiceResult MakeError<E>(string message) where E : ServiceError, new() => new ServiceResult(new E { Message = message });
         public static ServiceResult<T> NullCheck<T>(T value) where T : class 
             => value == null ? ServiceResult<T>.MakeError<NotFoundError>() : MakeOk(value);
 
@@ -35,7 +35,7 @@ namespace CheckNoteNet5.Shared.Services
             if (response.IsSuccessStatusCode) 
                 return new ServiceResult(statusCode: response.StatusCode);
 
-            var error = content.Length > 0 ? JsonSerializer.Deserialize<Error>(content) : new Error(statusCode: response.StatusCode);
+            var error = content.Length > 0 ? JsonSerializer.Deserialize<ServiceError>(content) : new ServiceError(statusCode: response.StatusCode);
 
             return new ServiceResult(error);
         }
@@ -45,22 +45,21 @@ namespace CheckNoteNet5.Shared.Services
 
     public class ServiceResult<T> : ServiceResult
     {
-        //maybe add a way to detect if value set
-        private T _value { get; set; }
+        private T _value;
         public bool hasValue = false;
         public T Value
         {
             get => _value;
-            set { hasValue = true; _value = value; }
+            set { _value = value; hasValue = true; }
         }
 
         public ServiceResult(T value = default, HttpStatusCode statusCode = HttpStatusCode.OK) : base(statusCode) => Value = value;
-        public ServiceResult(Error error) : base(error) { }
-        public new static ServiceResult<T> MakeError<E>() where E : Error, new() => new ServiceResult<T>(new E());
-        public new static ServiceResult<T> MakeError<E>(string message) where E : Error, new() => new ServiceResult<T>(new E { Message = message });
+        public ServiceResult(ServiceError error) : base(error) { }
+        public new static ServiceResult<T> MakeError<E>() where E : ServiceError, new() => new ServiceResult<T>(new E());
+        public new static ServiceResult<T> MakeError<E>(string message) where E : ServiceError, new() => new ServiceResult<T>(new E { Message = message });
         public ServiceResult<T> Ok(T value = default, HttpStatusCode statusCode = HttpStatusCode.OK) => ServiceResult.MakeOk(value, statusCode);
-        public ServiceResult<T> Error<E>() where E : Error, new() => new ServiceResult<T>(new E());
-        public ServiceResult<T> Error<E>(string message) where E : Error, new() => new ServiceResult<T>(new E { Message = message });
+        public ServiceResult<T> Error<E>() where E : ServiceError, new() => new ServiceResult<T>(new E());
+        public ServiceResult<T> Error<E>(string message) where E : ServiceError, new() => new ServiceResult<T>(new E { Message = message });
 
         public new static async Task<ServiceResult<T>> Parse(HttpResponseMessage response)
         {
@@ -77,7 +76,7 @@ namespace CheckNoteNet5.Shared.Services
                 return new ServiceResult<T>(statusCode: response.StatusCode);
             }
 
-            var error = content.Length > 0 ? JsonSerializer.Deserialize<Error>(content) : new Error(statusCode: response.StatusCode);
+            var error = content.Length > 0 ? JsonSerializer.Deserialize<ServiceError>(content) : new ServiceError(statusCode: response.StatusCode);
 
             return new ServiceResult<T>(error);
         }

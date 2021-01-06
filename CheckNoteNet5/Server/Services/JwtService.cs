@@ -47,7 +47,7 @@ namespace CheckNoteNet5.Server.Services
             var roles = await userManager.GetRolesAsync(user);
 
             // claims.AddRange(await userManager.GetClaimsAsync(user));
-            claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role))); // not adding claims associated with roles
+            claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
             return claims;
         }

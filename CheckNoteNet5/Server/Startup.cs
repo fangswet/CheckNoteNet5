@@ -1,6 +1,6 @@
 using AutoMapper;
 using CheckNoteNet5.Server.Services;
-using CheckNoteNet5.Server.Services.ServiceItems;
+using CheckNoteNet5.Server.Services.Filters;
 using CheckNoteNet5.Shared.Models.Auth;
 using CheckNoteNet5.Shared.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -45,7 +44,6 @@ namespace CheckNoteNet5.Server
                 .AddEntityFrameworkStores<CheckNoteContext>();
 
             services.AddAuthentication()
-                // outsource configuration
                 .AddCookie(IdentityConstants.ApplicationScheme, options =>
                 {
                     options.Events = new CookieAuthenticationEvents
@@ -67,7 +65,6 @@ namespace CheckNoteNet5.Server
                     };
                 });
 
-            // support multiple schemes
             services.AddAuthorization(options =>
             {
                 var cookiePolicy = new AuthorizationPolicyBuilder(IdentityConstants.ApplicationScheme)
@@ -81,7 +78,7 @@ namespace CheckNoteNet5.Server
                 options.DefaultPolicy = new AuthorizationPolicyBuilder().Combine(cookiePolicy).Combine(jwtPolicy).Build();
             });
 
-            services.AddControllersWithViews();
+            services.AddControllersWithViews(options => options.Filters.Add(new ServiceExceptionFilter()));
             services.AddRazorPages();
 
             services.AddAutoMapper(typeof(Startup));
@@ -124,8 +121,6 @@ namespace CheckNoteNet5.Server
                 endpoints.MapControllers();
                 endpoints.MapFallbackToPage("/_Host");
             });
-
-            // move this
 
             if (!roleManager.RoleExistsAsync(Role.Admin).Result)
             {

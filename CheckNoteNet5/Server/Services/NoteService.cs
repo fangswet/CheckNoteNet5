@@ -1,14 +1,14 @@
 ﻿using AutoMapper;
 using CheckNoteNet5.Shared.Models;
-using CheckNoteNet5.Shared.Models.Auth;
 using CheckNoteNet5.Shared.Services;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+// important to note that service methods are only concerned with presenting a usable api 
+// and do not explicitly check for scenarios outside of usual (predetermined) usage
+// e.g the NoteService.Add method will not provide back any helpful information when trying to attach a nonexistent Tag id
 namespace CheckNoteNet5.Server.Services
 {
     public class NoteService : INoteService
@@ -26,13 +26,16 @@ namespace CheckNoteNet5.Server.Services
             this.questionService = questionService;
         }
 
+        // perhaps
         public async Task<ServiceResult<Note.Model>> Add(Note.Input input)
         {
             var unauthorized = ServiceResult<Note.Model>.MakeError<UnauthorizedError>();
-            var userId = authService.UserId;
-            if (userId == null) return unauthorized;
 
-            Note note = input;
+            var userId = authService.UserId;
+            if (userId == null) return ServiceResult<Note.Model>.MakeError<UnauthorizedError>();
+            //var userId2 = authService.UserId ?? throw new UnauthorizedException();
+
+            var note = (Note)input;
 
             if (note.ParentId != null)
             {
@@ -40,12 +43,28 @@ namespace CheckNoteNet5.Server.Services
                 if (parent == null && parent.AuthorId != userId) return unauthorized;
             }
 
+            note.Tags = await ConvertTags(note.Tags);
             note.AuthorId = (int)userId;
 
             await dbContext.Notes.AddAsync(note);
             await dbContext.SaveChangesAsync();
 
             return await Get(note.Id);
+        }
+
+        private async Task<Tag[]> ConvertTags(ICollection<Tag> tags)
+        {
+            var conversion = tags.Select(async t =>
+            {
+                if (t.Id != default)
+                {
+                    var tag = await dbContext.Tags.FindAsync(t.Id);
+                    if (tag != null) return tag;
+                }
+                return t;
+            });
+
+            return await Task.WhenAll(conversion);
         }
 
         public async Task<ServiceResult<Note.Model>> Get(int id)

@@ -13,9 +13,24 @@ namespace CheckNoteNet5.Server.Services
         private readonly UserService userService;
         private readonly JwtService jwtService;
         private readonly HttpContext httpContext;
-        public int? UserId { get; init; }
+        private int? userId;
+        public int UserId
+        {
+            get
+            {
+                if (userId == null)
+                {
+                    if (httpContext.User.Identity.IsAuthenticated && int.TryParse(userManager.GetUserId(httpContext.User), out int id))
+                    {
+                        userId = id;
+                        return id;
+                    }
+                    throw new UnauthorizedException();
+                }
+                return (int)userId;
+            }
+        }
 
-        // important: find a way to register a service by many interfaces
         public AuthService(UserManager<User> userManager, SignInManager<User> signInManager, UserService userService, JwtService jwtService, IHttpContextAccessor httpContextAccessor)
         {
             this.userManager = userManager;
@@ -23,9 +38,6 @@ namespace CheckNoteNet5.Server.Services
             this.userService = userService;
             this.jwtService = jwtService;
             httpContext = httpContextAccessor.HttpContext;
-
-            // check if this goes to db
-            if (int.TryParse(userManager.GetUserId(httpContext.User), out int id)) UserId = id;
         }
 
         public async Task<ServiceResult> Login(Login credentials)
@@ -60,21 +72,15 @@ namespace CheckNoteNet5.Server.Services
 
         public async Task<ServiceResult<string>> Jwt(Login input)
         {
-            var result = new ServiceResult<string>();
+            var unauthorized = ServiceResult<string>.MakeError<UnauthorizedError>();
 
             var user = await userManager.FindByEmailAsync(input.Email);
-            if (user == null) return result.Error<UnauthorizedError>();
+            if (user == null) return unauthorized;
 
-            await signInManager.CheckPasswordSignInAsync(user, input.Password, false);
+            var signIn = await signInManager.CheckPasswordSignInAsync(user, input.Password, false);
+            if (!signIn.Succeeded) return unauthorized;
 
-            return result.Ok(await jwtService.GenerateToken(user));
-        }
-
-        public async Task<ServiceResult<User.Model>> GetUser()
-        {
-            if (UserId == null) return ServiceResult<User.Model>.MakeError<UnauthorizedError>();
-
-            return await userService.Get((int)UserId);
+            return ServiceResult.MakeOk(await jwtService.GenerateToken(user));
         }
     }
 }
