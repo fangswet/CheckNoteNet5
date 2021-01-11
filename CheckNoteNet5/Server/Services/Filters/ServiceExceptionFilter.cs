@@ -1,6 +1,5 @@
 ﻿using CheckNoteNet5.Server.Services.Extensions;
 using CheckNoteNet5.Shared.Services;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace CheckNoteNet5.Server.Services.Filters

@@ -1,0 +1,16 @@
+﻿@page "/loggedIn"
+@using CheckNoteNet5.Shared.Services
+@inject IAuthService AuthService 
+
+<h3>LoggedIn: @loggedIn</h3>
+
+@code 
+{
+    private bool loggedIn;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = await AuthService.GetUser();
+        loggedIn = user.IsOk;
+    }
+}

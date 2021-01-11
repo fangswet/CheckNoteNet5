@@ -20,6 +20,10 @@ namespace CheckNoteNet5.Shared.Services
 
         public ServiceResult(HttpStatusCode statusCode = HttpStatusCode.OK) => this.statusCode = statusCode;
         public ServiceResult(ServiceError error) => this.error = error;
+        public void Unwrap()
+        {
+            if (!IsOk) throw new ServiceException(error);
+        }
 
         public static ServiceResult MakeOk(HttpStatusCode statusCode = HttpStatusCode.OK) => new ServiceResult(statusCode);
         public static ServiceResult<T> MakeOk<T>(T value = default, HttpStatusCode statusCode = HttpStatusCode.OK) => new ServiceResult<T>(value, statusCode);
@@ -60,6 +64,11 @@ namespace CheckNoteNet5.Shared.Services
         public ServiceResult<T> Ok(T value = default, HttpStatusCode statusCode = HttpStatusCode.OK) => ServiceResult.MakeOk(value, statusCode);
         public ServiceResult<T> Error<E>() where E : ServiceError, new() => new ServiceResult<T>(new E());
         public ServiceResult<T> Error<E>(string message) where E : ServiceError, new() => new ServiceResult<T>(new E { Message = message });
+        public new T Unwrap()
+        {
+            base.Unwrap();
+            return _value;
+        }
 
         public new static async Task<ServiceResult<T>> Parse(HttpResponseMessage response)
         {

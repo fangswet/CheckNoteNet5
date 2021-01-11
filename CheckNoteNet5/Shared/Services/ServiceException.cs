@@ -1,19 +1,18 @@
 ﻿using System;
-using System.Net;
 
 namespace CheckNoteNet5.Shared.Services
 {
     public class ServiceException : Exception
     {
         public ServiceError Error { get; init; }
-
-        public ServiceException(string message = null) : base(message)
-        { }
+        public ServiceException() { }
+        public ServiceException(ServiceError error) => Error = error;
     }
 
     public class ServiceException<TError> : ServiceException where TError : ServiceError, new()
     {
-        public ServiceException(string message = null) : base(message) => Error = new TError();
+        public ServiceException() => Error = new TError();
+        public ServiceException(string message) => Error = new TError { Message = message };
     }
 
     public class UnauthorizedException : ServiceException<UnauthorizedError>

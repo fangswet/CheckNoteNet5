@@ -2,6 +2,7 @@
 {
     public enum ErrorCode
     {
-        Developer = 1000
+        Developer,
+        UserExists
     }
 }

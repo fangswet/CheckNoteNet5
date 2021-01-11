@@ -1,6 +1,7 @@
-﻿using CheckNoteNet5.Server.Services;
-using CheckNoteNet5.Server.Services.Extensions;
+﻿using CheckNoteNet5.Server.Services.Extensions;
 using CheckNoteNet5.Shared.Models.Auth;
+using CheckNoteNet5.Shared.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -10,9 +11,9 @@ namespace CheckNoteNet5.Server.Controllers
     [Route("api/[action]")]
     public class AuthController : ControllerBase
     {
-        private readonly AuthService authService;
+        private readonly IAuthService authService;
 
-        public AuthController(AuthService authService)
+        public AuthController(IAuthService authService)
         {
             this.authService = authService;
         }
@@ -25,5 +26,12 @@ namespace CheckNoteNet5.Server.Controllers
 
         [HttpPost]
         public async Task<ActionResult<string>> Jwt(Login user) => await authService.Jwt(user).MapToAction();
+
+        [Authorize]
+        public async Task Logout() => await authService.Logout();
+
+        [Authorize]
+        [HttpGet]
+        public async new Task<ActionResult<User.Model>> User() => await authService.GetUser().MapToAction();
     }
 }

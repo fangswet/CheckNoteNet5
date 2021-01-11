@@ -14,22 +14,6 @@ namespace CheckNoteNet5.Server.Services
         private readonly JwtService jwtService;
         private readonly HttpContext httpContext;
         private int? userId;
-        public int UserId
-        {
-            get
-            {
-                if (userId == null)
-                {
-                    if (httpContext.User.Identity.IsAuthenticated && int.TryParse(userManager.GetUserId(httpContext.User), out int id))
-                    {
-                        userId = id;
-                        return id;
-                    }
-                    throw new UnauthorizedException();
-                }
-                return (int)userId;
-            }
-        }
 
         public AuthService(UserManager<User> userManager, SignInManager<User> signInManager, UserService userService, JwtService jwtService, IHttpContextAccessor httpContextAccessor)
         {
@@ -38,6 +22,36 @@ namespace CheckNoteNet5.Server.Services
             this.userService = userService;
             this.jwtService = jwtService;
             httpContext = httpContextAccessor.HttpContext;
+        }
+
+        public int GetUserId()
+        {
+            if (userId == null)
+            {
+                if (httpContext.User.Identity.IsAuthenticated &&
+                    int.TryParse(userManager.GetUserId(httpContext.User), out int id))
+                {
+                    userId = id;
+                    return id;
+                }
+                throw new UnauthorizedException();
+            }
+            return (int)userId;
+        }
+
+        public async Task<ServiceResult<User.Model>> GetUser()
+        {
+            var result = new ServiceResult<User.Model>();
+
+            try
+            {
+                var user = await userService.Get(GetUserId());
+                return result.Ok(user.Unwrap());
+            }
+            catch
+            {
+                return result.Error<UnauthorizedError>();
+            }
         }
 
         public async Task<ServiceResult> Login(Login credentials)
@@ -55,7 +69,7 @@ namespace CheckNoteNet5.Server.Services
         public async Task<ServiceResult<User.Model>> Register(Register credentials)
         {
             if ((await userManager.FindByEmailAsync(credentials.Email)) != null || (await userManager.FindByNameAsync(credentials.UserName)) != null)
-                return ServiceResult<User.Model>.MakeError<ConflictError>("user already exists");
+                return ServiceResult<User.Model>.MakeError<UserExistsError>();
 
             var user = new User(credentials);
             await userManager.CreateAsync(user, credentials.Password);
@@ -63,21 +77,16 @@ namespace CheckNoteNet5.Server.Services
             return await userService.Get(user.Id);
         }
 
-        public async Task<ServiceResult> Logout()
-        {
-            await signInManager.SignOutAsync();
+        public async Task Logout() => await signInManager.SignOutAsync();
 
-            return ServiceResult.MakeOk();
-        }
-
-        public async Task<ServiceResult<string>> Jwt(Login input)
+        public async Task<ServiceResult<string>> Jwt(Login credentials)
         {
             var unauthorized = ServiceResult<string>.MakeError<UnauthorizedError>();
 
-            var user = await userManager.FindByEmailAsync(input.Email);
+            var user = await userManager.FindByEmailAsync(credentials.Email);
             if (user == null) return unauthorized;
 
-            var signIn = await signInManager.CheckPasswordSignInAsync(user, input.Password, false);
+            var signIn = await signInManager.CheckPasswordSignInAsync(user, credentials.Password, false);
             if (!signIn.Succeeded) return unauthorized;
 
             return ServiceResult.MakeOk(await jwtService.GenerateToken(user));

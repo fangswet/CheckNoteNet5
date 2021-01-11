@@ -83,9 +83,9 @@ namespace CheckNoteNet5.Server
 
             services.AddAutoMapper(typeof(Startup));
 
+            services.AddScoped<CacheService>();
             services.AddScoped<JwtService>();
             services.AddScoped<IAuthService, AuthService>();
-            services.AddScoped<AuthService>();
             services.AddScoped<UserService>();
             services.AddScoped<INoteService, NoteService>();
             services.AddScoped<QuestionService>();

@@ -7,9 +7,12 @@ namespace CheckNoteNet5.Shared.Services
 {
     public interface IAuthService
     {
+        int GetUserId();
         Task<ServiceResult> Login(Login credentials);
         Task<ServiceResult<User.Model>> Register(Register credentials);
-        Task<ServiceResult> Logout();
+        Task Logout();
+        Task<ServiceResult<string>> Jwt(Login credentials);
+        Task<ServiceResult<User.Model>> GetUser();
     }
 
     public interface INoteService

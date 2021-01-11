@@ -43,14 +43,14 @@ namespace CheckNoteNet5.Shared.Models
             [MaxCount(10)]
             public List<Tag.Model> Tags { get; init; } = new List<Tag.Model>();
 
-            public static implicit operator Note(Input i) => new Note 
+            public Note Convert() => new Note 
             { 
-                Title = i.Title, 
-                Description = i.Description, 
-                ParentId = i.ParentId,
-                Content = new ContentDto { NoteId = null, Text = i.Text },
-                Questions = i.Questions.ConvertAll(qi => (Question)qi), // does this REALLY have to be converted? who the fuck cares what class this is
-                Tags = i.Tags.ConvertAll(ti => (Tag)ti)
+                Title = Title, 
+                Description = Description, 
+                ParentId = ParentId,
+                Content = new ContentDto { NoteId = null, Text = Text },
+                Questions = Questions.ConvertAll(qi => (Question)qi), // does this REALLY have to be converted? who the fuck cares what class this is
+                Tags = Tags.ConvertAll(ti => (Tag)ti)
             };
         }
 
@@ -61,11 +61,13 @@ namespace CheckNoteNet5.Shared.Models
             public string Description { get; init; }
             public User.Model Author { get; init; }
             public Model Parent { get; init; }
-            public ICollection<Model> Children { get; init; }
+            public List<Model> Children { get; init; }
+            public List<Tag.Model> Tags { get; init; }
             public string Text { get; init; }
         }
 
         // could be simplified if I used Include instead of lazy loading (i.e dont include Content)
+        // so include then project to
         public class Entry
         {
             public int Id { get; init; }

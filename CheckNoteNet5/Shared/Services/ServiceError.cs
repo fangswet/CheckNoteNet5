@@ -51,4 +51,10 @@ namespace CheckNoteNet5.Shared.Services
         public BadRequestError() : base(statusCode: HttpStatusCode.BadRequest)
         { }
     }
+
+    public class UserExistsError : ServiceError
+    {
+        public UserExistsError() : base(ErrorCode.UserExists, "user already exists", HttpStatusCode.Conflict)
+        { }
+    }
 }
