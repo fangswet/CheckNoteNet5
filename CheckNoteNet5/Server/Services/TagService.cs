@@ -2,7 +2,6 @@
 using CheckNoteNet5.Shared.Models;
 using CheckNoteNet5.Shared.Services;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -20,12 +19,12 @@ namespace CheckNoteNet5.Server.Services
             this.mapper = mapper;
         }
 
-        public async Task<ServiceResult<List<Note.Entry>>> GetNotes(int id)
+        public async Task<ServiceResult<List<NoteEntry>>> GetNotes(int id)
         {
             var query = dbContext.Tags.Where(t => t.Id == id);
-            if (await query.FirstOrDefaultAsync() == null) return ServiceResult<List<Note.Entry>>.MakeError<NotFoundError>();
+            if (await query.FirstOrDefaultAsync() == null) return ServiceResult<List<NoteEntry>>.MakeError<NotFoundError>();
 
-            var notes = await mapper.ProjectTo<Note.Entry>(query.SelectMany(t => t.Notes)).ToListAsync();
+            var notes = await mapper.ProjectTo<NoteEntry>(query.SelectMany(t => t.Notes)).ToListAsync();
             return ServiceResult.MakeOk(notes);
         }
     }

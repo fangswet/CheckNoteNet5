@@ -1,5 +1,6 @@
 ﻿using CheckNoteNet5.Server.Services.Extensions;
 using CheckNoteNet5.Shared.Models;
+using CheckNoteNet5.Shared.Models.Inputs;
 using CheckNoteNet5.Shared.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -23,14 +24,14 @@ namespace CheckNoteNet5.Server.Controllers
         [Route("{id}")]
         [AllowAnonymous]
         [HttpGet]
-        public async Task<ActionResult<Note.Model>> Get(int id) => await noteService.Get(id).MapToAction();
+        public async Task<ActionResult<NoteModel>> Get(int id) => await noteService.Get(id).MapToAction();
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<ActionResult<List<Note.Entry>>> List([FromQuery] string title) => await noteService.List(title).MapToAction();
+        public async Task<ActionResult<List<NoteEntry>>> List(string title) => await noteService.List(title).MapToAction();
 
         [HttpPost]
-        public async Task<ActionResult<Note.Model>> Add(Note.Input input) => await noteService.Add(input).MapToAction();
+        public async Task<ActionResult<NoteModel>> Add(NoteInput input) => await noteService.Add(input).MapToAction();
 
         [Route("{id}")]
         [HttpDelete]
@@ -38,6 +39,6 @@ namespace CheckNoteNet5.Server.Controllers
         
         [Route("{id}")]
         [HttpPatch]
-        public async Task<ActionResult<Note.Model>> Update(int id, Note.Input input) => await noteService.Update(id, input).MapToAction();
+        public async Task<ActionResult<NoteModel>> Update(int id, NoteInput input) => await noteService.Update(id, input).MapToAction();
     }
 }

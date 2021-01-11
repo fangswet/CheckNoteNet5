@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CheckNoteNet5.Shared.Models;
+using CheckNoteNet5.Shared.Models.Dtos;
 using CheckNoteNet5.Shared.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -20,15 +21,15 @@ namespace CheckNoteNet5.Server.Services
             this.mapper = mapper;
         }
 
-        public async Task<ServiceResult<Course.Entry>> Get(int id)
+        public async Task<ServiceResult<CourseEntry>> Get(int id)
         {
             var query = dbContext.Questions.Where(q => q.Id == id);
-            var question = await mapper.ProjectTo<Course.Entry>(query).FirstOrDefaultAsync();
+            var question = await mapper.ProjectTo<CourseEntry>(query).FirstOrDefaultAsync();
 
             return ServiceResult.NullCheck(question);
         }
 
-        public async Task<ServiceResult<Course.Entry>> Add(Course course)
+        public async Task<ServiceResult<CourseEntry>> Add(Course course)
         {
             course.AuthorId = authService.GetUserId(); // caution implied that authorization is in place
 

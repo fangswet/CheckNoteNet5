@@ -1,4 +1,6 @@
-﻿using CheckNoteNet5.Shared.Models.Auth;
+﻿using CheckNoteNet5.Shared.Models;
+using CheckNoteNet5.Shared.Models.Dtos;
+using CheckNoteNet5.Shared.Models.Inputs;
 using CheckNoteNet5.Shared.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -39,9 +41,9 @@ namespace CheckNoteNet5.Server.Services
             return (int)userId;
         }
 
-        public async Task<ServiceResult<User.Model>> GetUser()
+        public async Task<ServiceResult<UserModel>> GetUser()
         {
-            var result = new ServiceResult<User.Model>();
+            var result = new ServiceResult<UserModel>();
 
             try
             {
@@ -54,7 +56,7 @@ namespace CheckNoteNet5.Server.Services
             }
         }
 
-        public async Task<ServiceResult> Login(Login credentials)
+        public async Task<ServiceResult> Login(LoginInput credentials)
         {
             var user = await userManager.FindByEmailAsync(credentials.Email);
             if (user == null) return ServiceResult.MakeError<NotFoundError>();
@@ -66,10 +68,10 @@ namespace CheckNoteNet5.Server.Services
             return ServiceResult.MakeError<UnauthorizedError>();
         }
 
-        public async Task<ServiceResult<User.Model>> Register(Register credentials)
+        public async Task<ServiceResult<UserModel>> Register(RegisterInput credentials)
         {
             if ((await userManager.FindByEmailAsync(credentials.Email)) != null || (await userManager.FindByNameAsync(credentials.UserName)) != null)
-                return ServiceResult<User.Model>.MakeError<UserExistsError>();
+                return ServiceResult<UserModel>.MakeError<UserExistsError>();
 
             var user = new User(credentials);
             await userManager.CreateAsync(user, credentials.Password);
@@ -79,7 +81,7 @@ namespace CheckNoteNet5.Server.Services
 
         public async Task Logout() => await signInManager.SignOutAsync();
 
-        public async Task<ServiceResult<string>> Jwt(Login credentials)
+        public async Task<ServiceResult<string>> Jwt(LoginInput credentials)
         {
             var unauthorized = ServiceResult<string>.MakeError<UnauthorizedError>();
 

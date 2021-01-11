@@ -19,6 +19,6 @@ namespace CheckNoteNet5.Server.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<Note.Entry>>> Notes(int id) => await tagService.GetNotes(id).MapToAction();
+        public async Task<ActionResult<List<NoteEntry>>> Notes(int id) => await tagService.GetNotes(id).MapToAction();
     }
 }

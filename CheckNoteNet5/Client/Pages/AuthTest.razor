@@ -1,7 +1,7 @@
 ﻿@page "/login" 
 
-@using CheckNoteNet5.Shared.Models.Auth
 @using CheckNoteNet5.Shared.Services
+@using CheckNoteNet5.Shared.Models.Inputs
 @inject IAuthService AuthService
 @inject NavigationManager NavigationManager
 
@@ -13,7 +13,7 @@
 
 @code
 {
-    private Login credentials = new Login { Email = "admin@admin.com", Password = "admin" };
+    private LoginInput credentials = new LoginInput { Email = "admin@admin.com", Password = "admin" };
 
     private async Task Login()
     {

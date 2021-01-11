@@ -1,15 +1,13 @@
 ﻿using AutoMapper;
 using CheckNoteNet5.Shared.Models;
+using CheckNoteNet5.Shared.Models.Dtos;
+using CheckNoteNet5.Shared.Models.Inputs;
 using CheckNoteNet5.Shared.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-// important to note that service methods are only concerned with presenting a usable api 
-// and do not explicitly check for scenarios outside of usual (predetermined) usage
-// e.g the NoteService.Add method will not provide back any helpful information when trying to attach a nonexistent Tag id
 namespace CheckNoteNet5.Server.Services
 {
     public class NoteService : INoteService
@@ -29,15 +27,15 @@ namespace CheckNoteNet5.Server.Services
             this.cacheService = cacheService;
         }
 
-        public async Task<ServiceResult<Note.Model>> Add(Note.Input input)
+        public async Task<ServiceResult<NoteModel>> Add(NoteInput input)
         {
-            var note = input.Convert();
+            var note = mapper.Map<Note>(input);
 
             if (note.ParentId != null)
             {
                 var parent = await dbContext.Notes.FindAsync(note.ParentId);
                 if (parent == null && parent.AuthorId != authService.GetUserId())
-                    return ServiceResult<Note.Model>.MakeError<UnauthorizedError>();
+                    return ServiceResult<NoteModel>.MakeError<UnauthorizedError>();
             }
 
             note.Tags = await ConvertTags(note.Tags);
@@ -64,15 +62,15 @@ namespace CheckNoteNet5.Server.Services
             return await Task.WhenAll(conversion);
         }
 
-        private async Task<ServiceResult<Note.Model>> GetRaw(int id)
+        private async Task<ServiceResult<NoteModel>> GetRaw(int id)
         {
             var query = dbContext.Notes.Where(n => n.Id == id);
-            var note = await mapper.ProjectTo<Note.Model>(query).FirstOrDefaultAsync();
+            var note = await mapper.ProjectTo<NoteModel>(query).FirstOrDefaultAsync();
 
             return ServiceResult.NullCheck(note);
         }
 
-        public async Task<ServiceResult<Note.Model>> Get(int id) => await cacheService.Get($"note/{id}", _ => GetRaw(id));
+        public async Task<ServiceResult<NoteModel>> Get(int id) => await cacheService.Get($"note/{id}", _ => GetRaw(id));
 
         public async Task<ServiceResult> Remove(int id)
         {
@@ -86,10 +84,10 @@ namespace CheckNoteNet5.Server.Services
             return ServiceResult.MakeOk();
         }
 
-        public async Task<ServiceResult<Note.Model>> Update(int id, Note.Input input)
+        public async Task<ServiceResult<NoteModel>> Update(int id, NoteInput input)
         {
             var note = await dbContext.Notes.Where(n => n.Id == id).FirstOrDefaultAsync();
-            var result = new ServiceResult<Note.Model>();
+            var result = new ServiceResult<NoteModel>();
 
             if (note == null) return result.Error<NotFoundError>();
 
@@ -103,10 +101,10 @@ namespace CheckNoteNet5.Server.Services
             return await Get(id);
         }
 
-        public async Task<ServiceResult<Question.Model>> AddQuestion(int id, Question.Input input)
+        public async Task<ServiceResult<QuestionModel>> AddQuestion(int id, QuestionInput input)
         {
             var note = await dbContext.Notes.FindAsync(id);
-            var question = (Question)input;
+            var question = mapper.Map<Question>(input);
 
             note.Questions.Add(question);
             await dbContext.SaveChangesAsync();
@@ -115,13 +113,13 @@ namespace CheckNoteNet5.Server.Services
         }
 
         // add limits
-        public async Task<ServiceResult<List<Note.Entry>>> List(string title = null)
+        public async Task<ServiceResult<List<NoteEntry>>> List(string title = null)
         {
             var query = title == null 
                 ? dbContext.Notes.AsQueryable()
                 : dbContext.Notes.Where(n => n.Title.Contains(title));
 
-            var notes = await mapper.ProjectTo<Note.Entry>(query).ToListAsync();
+            var notes = await mapper.ProjectTo<NoteEntry>(query).ToListAsync();
 
             return ServiceResult.MakeOk(notes);
         }

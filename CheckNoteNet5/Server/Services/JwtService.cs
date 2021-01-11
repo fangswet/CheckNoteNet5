@@ -1,4 +1,4 @@
-﻿using CheckNoteNet5.Shared.Models.Auth;
+﻿using CheckNoteNet5.Shared.Models.Dtos;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;

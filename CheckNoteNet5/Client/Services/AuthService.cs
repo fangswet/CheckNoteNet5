@@ -1,4 +1,5 @@
-﻿using CheckNoteNet5.Shared.Models.Auth;
+﻿using CheckNoteNet5.Shared.Models;
+using CheckNoteNet5.Shared.Models.Inputs;
 using CheckNoteNet5.Shared.Services;
 using System;
 using System.Net.Http;
@@ -16,12 +17,12 @@ namespace CheckNoteNet5.Client.Services
             this.httpClient = httpClient;
         }
 
-        public async Task<ServiceResult> Login(Login credentials) => (ServiceResult)await httpClient.PostAsJsonAsync("api/login", credentials);
+        public async Task<ServiceResult> Login(LoginInput credentials) => (ServiceResult)await httpClient.PostAsJsonAsync("api/login", credentials);
 
-        public async Task<ServiceResult<User.Model>> Register(Register credentials) 
+        public async Task<ServiceResult<UserModel>> Register(RegisterInput credentials) 
             => await httpClient.PostAsJsonAsync("api/register", credentials);
 
-        public async Task<ServiceResult<User.Model>> GetUser() => await httpClient.GetAsync("api/user");
+        public async Task<ServiceResult<UserModel>> GetUser() => await httpClient.GetAsync("api/user");
 
         public Task Logout()
         {
@@ -33,7 +34,7 @@ namespace CheckNoteNet5.Client.Services
             throw new NotImplementedException();
         }
 
-        public Task<ServiceResult<string>> Jwt(Login credentials)
+        public Task<ServiceResult<string>> Jwt(LoginInput credentials)
         {
             throw new NotImplementedException();
         }

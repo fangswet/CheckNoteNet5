@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace CheckNoteNet5.Shared.Models.Auth
+namespace CheckNoteNet5.Shared.Models.Inputs
 {
-    public class Login
+    public class LoginInput
     {
         [Required]
         public string Email { get; set; }
@@ -10,7 +10,7 @@ namespace CheckNoteNet5.Shared.Models.Auth
         public string Password { get; set; }
     }
 
-    public class Register : Login
+    public class RegisterInput : LoginInput
     {
         [Required]
         public string UserName { get; set; }

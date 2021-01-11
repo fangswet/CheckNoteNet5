@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace CheckNoteNet5.Shared.Models.Auth
+namespace CheckNoteNet5.Shared.Models.Dtos
 {
     public class Role : IdentityRole<int>
     {

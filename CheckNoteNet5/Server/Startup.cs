@@ -1,7 +1,7 @@
 using AutoMapper;
 using CheckNoteNet5.Server.Services;
 using CheckNoteNet5.Server.Services.Filters;
-using CheckNoteNet5.Shared.Models.Auth;
+using CheckNoteNet5.Shared.Models.Dtos;
 using CheckNoteNet5.Shared.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

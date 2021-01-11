@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using CheckNoteNet5.Shared.Models.Auth;
+using CheckNoteNet5.Shared.Models;
 using CheckNoteNet5.Shared.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -18,10 +18,10 @@ namespace CheckNoteNet5.Server.Services
             this.mapper = mapper;
         }
 
-        public async Task<ServiceResult<User.Model>> Get(int id)
+        public async Task<ServiceResult<UserModel>> Get(int id)
         {
             var query = dbContext.Users.Where(u => u.Id == id);
-            var user = await mapper.ProjectTo<User.Model>(query).FirstOrDefaultAsync();
+            var user = await mapper.ProjectTo<UserModel>(query).FirstOrDefaultAsync();
 
             return ServiceResult.NullCheck(user);
         }

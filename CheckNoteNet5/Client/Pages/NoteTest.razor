@@ -1,5 +1,6 @@
 ﻿@page "/note/{id:int}"
 @using CheckNoteNet5.Shared.Models
+@using CheckNoteNet5.Shared.Models.Inputs
 @inject CheckNoteNet5.Shared.Services.INoteService NoteService
 
 <h3>id: @Id</h3>
@@ -40,8 +41,8 @@
 {
     [Parameter]
     public int Id { get; set; }
-    private Note.Model note;
-    private Note.Input newNote = new Note.Input();
+    private NoteModel note;
+    private NoteInput newNote = new NoteInput();
 
     protected override async Task OnInitializedAsync()
     {
@@ -57,7 +58,7 @@
         if (result.IsOk)
         {
             note = result.Value;
-            newNote = new Note.Input();
+            newNote = new NoteInput();
         }
     }
 }

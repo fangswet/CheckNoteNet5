@@ -1,5 +1,4 @@
-﻿using CheckNoteNet5.Shared.Models;
-using CheckNoteNet5.Shared.Models.Auth;
+﻿using CheckNoteNet5.Shared.Models.Dtos;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -21,7 +20,7 @@ namespace CheckNoteNet5.Server
         {
             base.OnConfiguring(optionsBuilder);
             optionsBuilder
-                .UseLazyLoadingProxies()
+                //.UseLazyLoadingProxies()
                 .UseSqlServer(configuration.GetConnectionString("Default"));
         }
 
@@ -69,7 +68,7 @@ namespace CheckNoteNet5.Server
                 course.HasOne(c => c.Author).WithMany(a => a.Courses); // bug
             });
 
-            builder.Entity<Course.TestResult>(testResult =>
+            builder.Entity<TestResult>(testResult =>
             {
                 testResult.Property(tr => tr.Timestamp).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 testResult.HasOne(tr => tr.Course).WithMany(c => c.TestResults).OnDelete(DeleteBehavior.Restrict);

@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using CheckNoteNet5.Shared.Models;
+using CheckNoteNet5.Shared.Models.Dtos;
+using CheckNoteNet5.Shared.Models.Inputs;
 using CheckNoteNet5.Shared.Services;
 using System.Threading.Tasks;
 
@@ -16,26 +18,26 @@ namespace CheckNoteNet5.Server.Services
             this.mapper = mapper;
         }
 
-        private Question.Model Convert(Question question)
+        private QuestionModel Convert(Question question)
         {
             switch (question.Type)
             {
-                case Question.QuestionType.Binary:
-                    return mapper.Map<Question.BinaryModel>(question);
-                case Question.QuestionType.Input:
-                case Question.QuestionType.Select:
-                    return mapper.Map<Question.UnaryModel>(question);
+                case QuestionType.Binary:
+                    return mapper.Map<BinaryQuestionModel>(question);
+                case QuestionType.Input:
+                case QuestionType.Select:
+                    return mapper.Map<UnaryQuestionModel>(question);
             }
 
             return null;
         }
 
-        public async Task<ServiceResult<Question.Model>> Add(Question.Input input)
+        public async Task<ServiceResult<QuestionModel>> Add(QuestionInput input)
         {
-            var question = (Question)input;
+            var question = mapper.Map<Question>(input);
             var model = Convert(question);
 
-            if (model == null) return ServiceResult<Question.Model>.MakeError<ConflictError>();
+            if (model == null) return ServiceResult<QuestionModel>.MakeError<ConflictError>();
 
             await dbContext.Questions.AddAsync(question);
             await dbContext.SaveChangesAsync();
@@ -43,7 +45,7 @@ namespace CheckNoteNet5.Server.Services
             return ServiceResult.MakeOk(model);
         }
 
-        public async Task<ServiceResult<Question.Model>> Get(int id)
+        public async Task<ServiceResult<QuestionModel>> Get(int id)
         {
             var question = await dbContext.Questions.FindAsync(id);
 
