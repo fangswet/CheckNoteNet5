@@ -18,6 +18,7 @@ namespace CheckNoteNet5.Client.Services
         }
 
         public async Task<ServiceResult<NoteModel>> Get(int id) => await httpClient.GetAsync($"api/note/{id}");
+        public async Task<ServiceResult<NoteModel>> Get(string title) => await httpClient.GetAsync($"api/note/{title}");
 
         public async Task<ServiceResult<NoteModel>> Add(NoteInput note) => await httpClient.PostAsJsonAsync("api/note", note);
 

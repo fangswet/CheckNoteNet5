@@ -17,13 +17,170 @@ namespace CheckNoteNet5.Server.Migrations
             modelBuilder
                 .UseIdentityColumns()
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("ProductVersion", "5.0.1");
+                .HasAnnotation("ProductVersion", "5.0.2");
 
             modelBuilder.HasSequence<int>("IDSequence")
                 .StartsAt(478261L)
                 .IncrementsBy(12343);
 
-            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Auth.Role", b =>
+            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Dtos.Answer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<bool?>("Correct")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("QuestionId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuestionId");
+
+                    b.ToTable("Answers");
+                });
+
+            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Dtos.Content", b =>
+                {
+                    b.Property<int?>("NoteId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("NoteId");
+
+                    b.ToTable("Contents");
+                });
+
+            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Dtos.Course", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<int>("AuthorId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorId");
+
+                    b.ToTable("Courses");
+                });
+
+            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Dtos.Note", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValueSql("NEXT VALUE FOR IDSequence");
+
+                    b.Property<int>("AuthorId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ContentId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsRoot")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTime>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ParentId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("RootId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Url")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorId");
+
+                    b.HasIndex("ContentId");
+
+                    b.HasIndex("ParentId");
+
+                    b.HasIndex("RootId");
+
+                    b.ToTable("Notes");
+                });
+
+            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Dtos.Question", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<bool?>("Correct")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Difficulty")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NoteId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("RootId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Text")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NoteId");
+
+                    b.HasIndex("RootId");
+
+                    b.ToTable("Questions");
+                });
+
+            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Dtos.Role", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -52,7 +209,74 @@ namespace CheckNoteNet5.Server.Migrations
                     b.ToTable("AspNetRoles");
                 });
 
-            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Auth.User", b =>
+            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Dtos.Snippet", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<int>("NoteId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NoteId");
+
+                    b.ToTable("Snippet");
+                });
+
+            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Dtos.Tag", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Tags");
+                });
+
+            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Dtos.TestResult", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<int>("CourseId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Result")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Timestamp")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("TestResults");
+                });
+
+            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Dtos.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -119,192 +343,12 @@ namespace CheckNoteNet5.Server.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
-            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Course", b =>
+            modelBuilder.Entity("CourseLikes", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<int>("AuthorId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AuthorId");
-
-                    b.ToTable("Courses");
-                });
-
-            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Course+TestResult", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
                     b.Property<int>("CourseId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Result")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("Timestamp")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
                     b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CourseId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("TestResults");
-                });
-
-            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Note", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasDefaultValueSql("NEXT VALUE FOR IDSequence");
-
-                    b.Property<int>("AuthorId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ContentId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("ModifiedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("ParentId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AuthorId");
-
-                    b.HasIndex("ContentId");
-
-                    b.HasIndex("ParentId");
-
-                    b.ToTable("Notes");
-                });
-
-            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Note+ContentDto", b =>
-                {
-                    b.Property<int?>("NoteId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<string>("Text")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("NoteId");
-
-                    b.ToTable("Contents");
-                });
-
-            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Question", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<bool?>("Correct")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("Difficulty")
-                        .HasColumnType("int");
-
-                    b.Property<int>("NoteId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Text")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NoteId");
-
-                    b.ToTable("Questions");
-                });
-
-            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Question+Answer", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<bool?>("Correct")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("QuestionId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Text")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("QuestionId");
-
-                    b.ToTable("Answers");
-                });
-
-            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Tag", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Tags");
-                });
-
-            modelBuilder.Entity("CourseLikes", b =>
-                {
-                    b.Property<int?>("CourseId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("CourseId", "UserId");
@@ -316,10 +360,10 @@ namespace CheckNoteNet5.Server.Migrations
 
             modelBuilder.Entity("CourseNotes", b =>
                 {
-                    b.Property<int?>("CourseId")
+                    b.Property<int>("CourseId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("NoteId")
+                    b.Property<int>("NoteId")
                         .HasColumnType("int");
 
                     b.HasKey("CourseId", "NoteId");
@@ -430,12 +474,27 @@ namespace CheckNoteNet5.Server.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("NoteTags", b =>
+            modelBuilder.Entity("NoteLikes", b =>
                 {
-                    b.Property<int?>("NoteId")
+                    b.Property<int>("NoteId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("TagId")
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("NoteId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("NoteLikes");
+                });
+
+            modelBuilder.Entity("NoteTags", b =>
+                {
+                    b.Property<int>("NoteId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TagId")
                         .HasColumnType("int");
 
                     b.HasKey("NoteId", "TagId");
@@ -445,24 +504,20 @@ namespace CheckNoteNet5.Server.Migrations
                     b.ToTable("NoteTags");
                 });
 
-            modelBuilder.Entity("QuestionTags", b =>
+            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Dtos.Answer", b =>
                 {
-                    b.Property<int?>("QuestionId")
-                        .HasColumnType("int");
+                    b.HasOne("CheckNoteNet5.Shared.Models.Dtos.Question", "Question")
+                        .WithMany("Answers")
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Property<int?>("TagId")
-                        .HasColumnType("int");
-
-                    b.HasKey("QuestionId", "TagId");
-
-                    b.HasIndex("TagId");
-
-                    b.ToTable("QuestionTags");
+                    b.Navigation("Question");
                 });
 
-            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Course", b =>
+            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Dtos.Course", b =>
                 {
-                    b.HasOne("CheckNoteNet5.Shared.Models.Auth.User", "Author")
+                    b.HasOne("CheckNoteNet5.Shared.Models.Dtos.User", "Author")
                         .WithMany("Courses")
                         .HasForeignKey("AuthorId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -471,15 +526,75 @@ namespace CheckNoteNet5.Server.Migrations
                     b.Navigation("Author");
                 });
 
-            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Course+TestResult", b =>
+            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Dtos.Note", b =>
                 {
-                    b.HasOne("CheckNoteNet5.Shared.Models.Course", "Course")
+                    b.HasOne("CheckNoteNet5.Shared.Models.Dtos.User", "Author")
+                        .WithMany("Notes")
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CheckNoteNet5.Shared.Models.Dtos.Content", "Content")
+                        .WithMany()
+                        .HasForeignKey("ContentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CheckNoteNet5.Shared.Models.Dtos.Note", "Parent")
+                        .WithMany("Children")
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("CheckNoteNet5.Shared.Models.Dtos.Note", "Root")
+                        .WithMany("AllChildren")
+                        .HasForeignKey("RootId");
+
+                    b.Navigation("Author");
+
+                    b.Navigation("Content");
+
+                    b.Navigation("Parent");
+
+                    b.Navigation("Root");
+                });
+
+            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Dtos.Question", b =>
+                {
+                    b.HasOne("CheckNoteNet5.Shared.Models.Dtos.Note", "Note")
+                        .WithMany("Questions")
+                        .HasForeignKey("NoteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CheckNoteNet5.Shared.Models.Dtos.Note", "Root")
+                        .WithMany("AllQuestions")
+                        .HasForeignKey("RootId");
+
+                    b.Navigation("Note");
+
+                    b.Navigation("Root");
+                });
+
+            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Dtos.Snippet", b =>
+                {
+                    b.HasOne("CheckNoteNet5.Shared.Models.Dtos.Note", "Note")
+                        .WithMany("Snippets")
+                        .HasForeignKey("NoteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Note");
+                });
+
+            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Dtos.TestResult", b =>
+                {
+                    b.HasOne("CheckNoteNet5.Shared.Models.Dtos.Course", "Course")
                         .WithMany("TestResults")
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("CheckNoteNet5.Shared.Models.Auth.User", "User")
+                    b.HasOne("CheckNoteNet5.Shared.Models.Dtos.User", "User")
                         .WithMany("TestResults")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -490,63 +605,15 @@ namespace CheckNoteNet5.Server.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Note", b =>
-                {
-                    b.HasOne("CheckNoteNet5.Shared.Models.Auth.User", "Author")
-                        .WithMany("Notes")
-                        .HasForeignKey("AuthorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CheckNoteNet5.Shared.Models.Note+ContentDto", "Content")
-                        .WithMany()
-                        .HasForeignKey("ContentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CheckNoteNet5.Shared.Models.Note", "Parent")
-                        .WithMany("Children")
-                        .HasForeignKey("ParentId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Author");
-
-                    b.Navigation("Content");
-
-                    b.Navigation("Parent");
-                });
-
-            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Question", b =>
-                {
-                    b.HasOne("CheckNoteNet5.Shared.Models.Note", "Note")
-                        .WithMany("Questions")
-                        .HasForeignKey("NoteId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Note");
-                });
-
-            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Question+Answer", b =>
-                {
-                    b.HasOne("CheckNoteNet5.Shared.Models.Question", "Question")
-                        .WithMany("Answers")
-                        .HasForeignKey("QuestionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Question");
-                });
-
             modelBuilder.Entity("CourseLikes", b =>
                 {
-                    b.HasOne("CheckNoteNet5.Shared.Models.Auth.User", null)
+                    b.HasOne("CheckNoteNet5.Shared.Models.Dtos.User", null)
                         .WithMany()
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("CheckNoteNet5.Shared.Models.Course", null)
+                    b.HasOne("CheckNoteNet5.Shared.Models.Dtos.Course", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -555,13 +622,13 @@ namespace CheckNoteNet5.Server.Migrations
 
             modelBuilder.Entity("CourseNotes", b =>
                 {
-                    b.HasOne("CheckNoteNet5.Shared.Models.Course", null)
+                    b.HasOne("CheckNoteNet5.Shared.Models.Dtos.Course", null)
                         .WithMany()
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("CheckNoteNet5.Shared.Models.Note", null)
+                    b.HasOne("CheckNoteNet5.Shared.Models.Dtos.Note", null)
                         .WithMany()
                         .HasForeignKey("NoteId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -570,7 +637,7 @@ namespace CheckNoteNet5.Server.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
-                    b.HasOne("CheckNoteNet5.Shared.Models.Auth.Role", null)
+                    b.HasOne("CheckNoteNet5.Shared.Models.Dtos.Role", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -579,7 +646,7 @@ namespace CheckNoteNet5.Server.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<int>", b =>
                 {
-                    b.HasOne("CheckNoteNet5.Shared.Models.Auth.User", null)
+                    b.HasOne("CheckNoteNet5.Shared.Models.Dtos.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -588,7 +655,7 @@ namespace CheckNoteNet5.Server.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<int>", b =>
                 {
-                    b.HasOne("CheckNoteNet5.Shared.Models.Auth.User", null)
+                    b.HasOne("CheckNoteNet5.Shared.Models.Dtos.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -597,13 +664,13 @@ namespace CheckNoteNet5.Server.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<int>", b =>
                 {
-                    b.HasOne("CheckNoteNet5.Shared.Models.Auth.Role", null)
+                    b.HasOne("CheckNoteNet5.Shared.Models.Dtos.Role", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CheckNoteNet5.Shared.Models.Auth.User", null)
+                    b.HasOne("CheckNoteNet5.Shared.Models.Dtos.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -612,67 +679,73 @@ namespace CheckNoteNet5.Server.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
                 {
-                    b.HasOne("CheckNoteNet5.Shared.Models.Auth.User", null)
+                    b.HasOne("CheckNoteNet5.Shared.Models.Dtos.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("NoteTags", b =>
+            modelBuilder.Entity("NoteLikes", b =>
                 {
-                    b.HasOne("CheckNoteNet5.Shared.Models.Note", null)
+                    b.HasOne("CheckNoteNet5.Shared.Models.Dtos.User", null)
                         .WithMany()
                         .HasForeignKey("NoteId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("CheckNoteNet5.Shared.Models.Tag", null)
+                    b.HasOne("CheckNoteNet5.Shared.Models.Dtos.Note", null)
                         .WithMany()
-                        .HasForeignKey("TagId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("QuestionTags", b =>
+            modelBuilder.Entity("NoteTags", b =>
                 {
-                    b.HasOne("CheckNoteNet5.Shared.Models.Question", null)
+                    b.HasOne("CheckNoteNet5.Shared.Models.Dtos.Note", null)
                         .WithMany()
-                        .HasForeignKey("QuestionId")
+                        .HasForeignKey("NoteId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("CheckNoteNet5.Shared.Models.Tag", null)
+                    b.HasOne("CheckNoteNet5.Shared.Models.Dtos.Tag", null)
                         .WithMany()
                         .HasForeignKey("TagId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Auth.User", b =>
+            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Dtos.Course", b =>
+                {
+                    b.Navigation("TestResults");
+                });
+
+            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Dtos.Note", b =>
+                {
+                    b.Navigation("AllChildren");
+
+                    b.Navigation("AllQuestions");
+
+                    b.Navigation("Children");
+
+                    b.Navigation("Questions");
+
+                    b.Navigation("Snippets");
+                });
+
+            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Dtos.Question", b =>
+                {
+                    b.Navigation("Answers");
+                });
+
+            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Dtos.User", b =>
                 {
                     b.Navigation("Courses");
 
                     b.Navigation("Notes");
 
                     b.Navigation("TestResults");
-                });
-
-            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Course", b =>
-                {
-                    b.Navigation("TestResults");
-                });
-
-            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Note", b =>
-                {
-                    b.Navigation("Children");
-
-                    b.Navigation("Questions");
-                });
-
-            modelBuilder.Entity("CheckNoteNet5.Shared.Models.Question", b =>
-                {
-                    b.Navigation("Answers");
                 });
 #pragma warning restore 612, 618
         }

@@ -3,6 +3,7 @@
     public class NoteModel : NoteEntry
     {
         public NoteModel Parent { get; init; }
+        public string Url { get; init; }
         public string Text { get; init; }
     }
 }

@@ -38,5 +38,10 @@ namespace CheckNoteNet5.Client.Services
         {
             throw new NotImplementedException();
         }
+
+        public void AssertAuthentication()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -3,12 +3,15 @@ using CheckNoteNet5.Server.Services;
 using CheckNoteNet5.Server.Services.Filters;
 using CheckNoteNet5.Shared.Models.Dtos;
 using CheckNoteNet5.Shared.Services;
+using GraphQL.Server;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -81,9 +84,10 @@ namespace CheckNoteNet5.Server
             services.AddControllersWithViews(options => options.Filters.Add(new ServiceExceptionFilter()));
             services.AddRazorPages();
 
+            // figure out adding maps
             services.AddAutoMapper(typeof(Startup));
 
-            services.AddScoped<CacheService>();
+            services.AddSingleton<CacheService>();
             services.AddScoped<JwtService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<UserService>();
@@ -91,9 +95,16 @@ namespace CheckNoteNet5.Server
             services.AddScoped<QuestionService>();
             services.AddScoped<CourseService>();
             services.AddScoped<TagService>();
+
+            services.AddScoped<Schema.Schema>();
+            services.AddGraphQL(options => options.EnableMetrics = false)
+                    .AddSystemTextJson()
+                    .AddGraphTypes(ServiceLifetime.Scoped)
+                    .AddDataLoader()
+                    .AddErrorInfoProvider(opt => opt.ExposeExceptionStackTrace = true);
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, UserManager<User> userManager, RoleManager<Role> roleManager)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, CheckNoteContext dbContext, UserManager<User> userManager, RoleManager<Role> roleManager)
         {
             if (env.IsDevelopment())
             {
@@ -114,6 +125,8 @@ namespace CheckNoteNet5.Server
             app.UseAuthentication();
             app.UseAuthorization();
 
+            app.UseGraphQL<Schema.Schema>();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapDefaultControllerRoute();
@@ -121,6 +134,35 @@ namespace CheckNoteNet5.Server
                 endpoints.MapControllers();
                 endpoints.MapFallbackToPage("/_Host");
             });
+
+            try
+            {
+                dbContext.Database.ExecuteSqlRaw("CREATE UNIQUE INDEX UK_CourseNote ON CourseNotes (NoteId, CourseId);");
+                dbContext.Database.ExecuteSqlRaw("CREATE UNIQUE INDEX UK_NoteTag ON NoteTags (NoteId, TagId);");
+                dbContext.Database.ExecuteSqlRaw("CREATE UNIQUE INDEX UK_CourseLike ON CourseLikes (UserId, CourseId);");
+                dbContext.Database.ExecuteSqlRaw("CREATE UNIQUE INDEX UK_NoteLike ON NoteLikes (UserId, NoteId);");
+                dbContext.Database.ExecuteSqlRaw(@"
+                    CREATE TRIGGER NoteModifiedAt
+                        ON [dbo].[Notes]
+                        FOR INSERT, UPDATE
+                    AS
+                    BEGIN
+                        SET NOCOUNT ON;
+
+	                    IF ((SELECT TRIGGER_NESTLEVEL()) > 1) RETURN;
+
+	                    DECLARE @Id INT
+
+	                    SELECT @Id = INSERTED.Id
+	                    FROM INSERTED
+
+	                    UPDATE dbo.Notes
+	                    SET ModifiedAt = GETDATE()
+	                    WHERE Id = @Id
+                    END
+                ");
+            }
+            catch (SqlException e) when (e.Number == 1913) { }
 
             if (!roleManager.RoleExistsAsync(Role.Admin).Result)
             {

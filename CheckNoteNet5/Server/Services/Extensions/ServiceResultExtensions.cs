@@ -22,5 +22,6 @@ namespace CheckNoteNet5.Server.Services.Extensions
 
         public static async Task<ActionResult> MapToAction(this Task<ServiceResult> sr) => (await sr).MapToAction();
         public static async Task<ActionResult<T>> MapToAction<T>(this Task<ServiceResult<T>> sr) => (await sr).MapToAction();
+        public static async Task<T> MapToValue<T>(this Task<ServiceResult<T>> sr) => (await sr).Unwrap();
     }
 }

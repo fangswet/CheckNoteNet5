@@ -1,14 +1,10 @@
-﻿@page "/note/{id:int}"
+﻿@page "/note/{title}"
+
 @using CheckNoteNet5.Shared.Models
 @using CheckNoteNet5.Shared.Models.Inputs
 @inject CheckNoteNet5.Shared.Services.INoteService NoteService
 
-<h3>id: @Id</h3>
-
-<p>title: @note?.Title</p>
-<p>description: @note?.Description</p>
-<p>text: @note?.Text</p>
-<p>author: @note?.Author?.UserName</p>
+@note?.Title;
 
 <div>
     add note
@@ -40,15 +36,14 @@
 @code
 {
     [Parameter]
-    public int Id { get; set; }
+    public string Title { get; set; }
     private NoteModel note;
     private NoteInput newNote = new NoteInput();
 
     protected override async Task OnInitializedAsync()
     {
-        var result = await NoteService.Get(Id);
-
-        note = result.Value;
+        var note = await NoteService.Get(Title);
+        this.note = note.Value;
     }
 
     private async Task Add()

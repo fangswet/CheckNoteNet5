@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CheckNoteNet5.Server", "Che
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CheckNoteNet5.Client", "CheckNoteNet5\Client\CheckNoteNet5.Client.csproj", "{1954204F-2216-4C03-BB92-E2FDDDD7D0CB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CheckNoteNet5.Shared", "CheckNoteNet5\Shared\CheckNoteNet5.Shared.csproj", "{5464F34B-1291-4C4D-8A76-3DF30498C317}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CheckNoteNet5.Shared", "CheckNoteNet5\Shared\CheckNoteNet5.Shared.csproj", "{9C48CD7B-A69E-4B36-825D-0D6434874D32}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,10 @@ Global
 		{1954204F-2216-4C03-BB92-E2FDDDD7D0CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1954204F-2216-4C03-BB92-E2FDDDD7D0CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1954204F-2216-4C03-BB92-E2FDDDD7D0CB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5464F34B-1291-4C4D-8A76-3DF30498C317}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5464F34B-1291-4C4D-8A76-3DF30498C317}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5464F34B-1291-4C4D-8A76-3DF30498C317}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5464F34B-1291-4C4D-8A76-3DF30498C317}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C48CD7B-A69E-4B36-825D-0D6434874D32}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C48CD7B-A69E-4B36-825D-0D6434874D32}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C48CD7B-A69E-4B36-825D-0D6434874D32}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C48CD7B-A69E-4B36-825D-0D6434874D32}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

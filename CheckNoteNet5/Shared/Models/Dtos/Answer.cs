@@ -1,9 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using AutoMapper;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CheckNoteNet5.Shared.Models.Dtos
 {
     [Table("Answers")]
+    [AutoMap(typeof(AnswerModel))]
     public class Answer
     {
         public int Id { get; init; }

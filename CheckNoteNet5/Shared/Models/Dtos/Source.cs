@@ -1,7 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using AutoMapper;
+using System.ComponentModel.DataAnnotations;
 
 namespace CheckNoteNet5.Shared.Models.Dtos
 {
+    [AutoMap(typeof(SourceModel))]
     public class Source
     {
         public int Id { get; set; }

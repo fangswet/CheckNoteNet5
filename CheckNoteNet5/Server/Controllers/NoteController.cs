@@ -21,10 +21,15 @@ namespace CheckNoteNet5.Server.Controllers
             this.noteService = noteService;
         }
 
-        [Route("{id}")]
+        //[Route("{id:int}")]
+        //[AllowAnonymous]
+        //[HttpGet]
+        //public async Task<ActionResult<NoteModel>> Get(int id) => await noteService.Get(id).MapToAction();
+
+        [Route("{title}")]
         [AllowAnonymous]
         [HttpGet]
-        public async Task<ActionResult<NoteModel>> Get(int id) => await noteService.Get(id).MapToAction();
+        public async Task<ActionResult<NoteModel>> Get(string title) => await noteService.Get(title).MapToAction();
 
         [HttpGet]
         [AllowAnonymous]

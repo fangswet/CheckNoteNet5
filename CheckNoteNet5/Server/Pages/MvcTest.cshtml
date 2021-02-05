@@ -1,0 +1,8 @@
+﻿@page "/mvc/test/{id:int}"
+@inject CheckNoteNet5.Shared.Services.INoteService NoteService
+
+@{
+    var note = (await NoteService.Get((int)RouteData.Values["id"])).Unwrap();
+}
+
+<h3>id: @note.Id</h3>

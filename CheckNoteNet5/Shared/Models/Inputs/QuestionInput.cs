@@ -1,13 +1,11 @@
-﻿using CheckNoteNet5.Shared.Models.Dtos;
-using System;
+﻿using AutoMapper;
+using CheckNoteNet5.Shared.Models.Dtos;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CheckNoteNet5.Shared.Models.Inputs
 {
+    [AutoMap(typeof(Question))]
     public class QuestionInput
     {
         [Required]

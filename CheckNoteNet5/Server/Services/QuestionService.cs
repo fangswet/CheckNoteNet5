@@ -7,18 +7,20 @@ using System.Threading.Tasks;
 
 namespace CheckNoteNet5.Server.Services
 {
-    public class QuestionService
+    public class QuestionService : ServerService
     {
         private readonly CheckNoteContext dbContext;
+        private readonly IAuthService authService;
         private readonly IMapper mapper;
 
-        public QuestionService(CheckNoteContext dbContext, IMapper mapper)
+        public QuestionService(CheckNoteContext dbContext, IAuthService authService, IMapper mapper)
         {
             this.dbContext = dbContext;
+            this.authService = authService;
             this.mapper = mapper;
         }
 
-        private QuestionModel Convert(Question question)
+        private QuestionModel MapToModel(Question question)
         {
             switch (question.Type)
             {
@@ -32,24 +34,47 @@ namespace CheckNoteNet5.Server.Services
             return null;
         }
 
-        public async Task<ServiceResult<QuestionModel>> Add(QuestionInput input)
+        public async Task<ServiceResult> Remove(int id)
         {
-            var question = mapper.Map<Question>(input);
-            var model = Convert(question);
+            var question = await dbContext.Questions.FindAsync(id);
 
-            if (model == null) return ServiceResult<QuestionModel>.MakeError<ConflictError>();
+            if (question == null)
+                return NotFound();
 
-            await dbContext.Questions.AddAsync(question);
+            if (question.Note.AuthorId != authService.GetUserId())
+                return Unauthorized();
+
+            dbContext.Questions.Remove(question);
             await dbContext.SaveChangesAsync();
 
-            return ServiceResult.MakeOk(model);
+            return Ok();
         }
 
         public async Task<ServiceResult<QuestionModel>> Get(int id)
         {
             var question = await dbContext.Questions.FindAsync(id);
 
-            return ServiceResult.NullCheck(Convert(question));
+            return NullCheck(MapToModel(question));
+        }
+
+        public async Task<ServiceResult<bool>> Answer(int id, AnswerAttempt answer)
+        {
+            var question = await dbContext.Questions.FindAsync(id);
+            var correct = false;
+
+            if (question == null)
+                return NotFound<bool>();
+
+            else if (question.Type == QuestionType.Binary && answer.Correct != null)
+                correct = question.Answer((bool)answer.Correct);
+
+            else if (question.Type == QuestionType.Select && answer.Answers != null)
+                correct = question.Answer(answer.Answers);
+
+            else if (question.Type == QuestionType.Input && answer.TextAnswers != null)
+                correct = question.Answer(answer.TextAnswers);
+
+            return Ok(correct);
         }
     }
 }

@@ -9,7 +9,7 @@ namespace CheckNoteNet5.Shared.Services
     public class ServiceResult
     {
         public ServiceError error;
-        public bool IsOk { get => error == null; }
+        public bool IsOk => error == null;
 
         public HttpStatusCode statusCode;
         public HttpStatusCode StatusCode 
@@ -31,6 +31,11 @@ namespace CheckNoteNet5.Shared.Services
         public static ServiceResult MakeError<E>(string message) where E : ServiceError, new() => new ServiceResult(new E { Message = message });
         public static ServiceResult<T> NullCheck<T>(T value) where T : class 
             => value == null ? ServiceResult<T>.MakeError<NotFoundError>() : MakeOk(value);
+        public static void AssertNotNull<T>(T value) where T : class
+        {
+            if (value == null) throw new ServiceException<NotFoundError>();
+        }
+        public ServiceResult<T> Cast<T>() => new ServiceResult<T>(error) { StatusCode = statusCode };
 
         public static async Task<ServiceResult> Parse(HttpResponseMessage response)
         {

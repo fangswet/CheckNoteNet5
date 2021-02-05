@@ -20,7 +20,7 @@ namespace CheckNoteNet5.Server
         {
             base.OnConfiguring(optionsBuilder);
             optionsBuilder
-                //.UseLazyLoadingProxies()
+                .UseLazyLoadingProxies()
                 .UseSqlServer(configuration.GetConnectionString("Default"));
         }
 
@@ -33,6 +33,8 @@ namespace CheckNoteNet5.Server
             builder.Entity<Note>(note =>
             {
                 note.Property(n => n.Id).HasDefaultValueSql("NEXT VALUE FOR IDSequence");
+                note.Property(n => n.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+                note.Property(n => n.IsRoot).HasDefaultValue(false);
                 note.HasOne(n => n.Parent).WithMany(n => n.Children).OnDelete(DeleteBehavior.Restrict);
                 note.HasMany(n => n.Courses).WithMany(c => c.Notes).UsingEntity<Dictionary<string, object>>
                 (
@@ -50,23 +52,34 @@ namespace CheckNoteNet5.Server
                     j => j.HasOne<Note>().WithMany().HasForeignKey("NoteId").OnDelete(DeleteBehavior.Restrict),
                     j => j.HasOne<Tag>().WithMany().HasForeignKey("TagId").OnDelete(DeleteBehavior.Restrict)
                 );
-                tag.HasMany(t => t.Questions).WithMany(n => n.Tags).UsingEntity<Dictionary<string, object>>
-                (
-                    "QuestionTags",
-                    j => j.HasOne<Question>().WithMany().HasForeignKey("QuestionId").OnDelete(DeleteBehavior.Restrict),
-                    j => j.HasOne<Tag>().WithMany().HasForeignKey("TagId").OnDelete(DeleteBehavior.Restrict)
-                );
             });
 
-            builder.Entity<Course>(course =>
+            builder.Entity<User>(user =>
             {
-                course.HasMany(c => c.Likes).WithMany(u => u.Likes).UsingEntity<Dictionary<string, object>>(
+                user.HasMany(u => u.CourseLikes).WithMany(c => c.Likes).UsingEntity<Dictionary<string, object>>(
                     "CourseLikes",
-                    j => j.HasOne<User>().WithMany().HasForeignKey("CourseId").OnDelete(DeleteBehavior.Restrict),
-                    j => j.HasOne<Course>().WithMany().HasForeignKey("UserId").OnDelete(DeleteBehavior.Restrict)
+                    j => j.HasOne<Course>().WithMany().HasForeignKey("UserId").OnDelete(DeleteBehavior.Restrict),
+                    j => j.HasOne<User>().WithMany().HasForeignKey("CourseId").OnDelete(DeleteBehavior.Restrict)
                 );
-                course.HasOne(c => c.Author).WithMany(a => a.Courses); // bug
+
+                user.HasMany(u => u.NoteLikes).WithMany(n => n.Likes).UsingEntity<Dictionary<string, object>>(
+                    "NoteLikes",
+                    j => j.HasOne<Note>().WithMany().HasForeignKey("UserId").OnDelete(DeleteBehavior.Restrict),
+                    j => j.HasOne<User>().WithMany().HasForeignKey("NoteId").OnDelete(DeleteBehavior.Restrict)
+                );
+
+                user.HasMany(u => u.Courses).WithOne(c => c.Author); // bug
             });
+
+            //builder.Entity<Course>(course =>
+            //{
+            //    course.HasMany(c => c.Likes).WithMany(u => u.CourseLikes).UsingEntity<Dictionary<string, object>>(
+            //        "CourseLikes",
+            //        j => j.HasOne<User>().WithMany().HasForeignKey("CourseId").OnDelete(DeleteBehavior.Restrict),
+            //        j => j.HasOne<Course>().WithMany().HasForeignKey("UserId").OnDelete(DeleteBehavior.Restrict)
+            //    );
+            //    course.HasOne(c => c.Author).WithMany(a => a.Courses); // bug
+            //});
 
             builder.Entity<TestResult>(testResult =>
             {

@@ -16,6 +16,9 @@ namespace CheckNoteNet5.Server.Services
         }
 
         public delegate Task<T> CacheAction<T>(ICacheEntry factory);
-        public async Task<T> Get<T>(string key, CacheAction<T> action) => await cache.GetOrCreateAsync(key, factory => action(factory));
+        public async Task<T> GetOrCreateAsync<T>(string key, CacheAction<T> action) 
+            => await cache.GetOrCreateAsync(key, factory => action(factory));
+
+        public T Set<T>(string key, T value) => cache.Set(key, value);
     }
 }

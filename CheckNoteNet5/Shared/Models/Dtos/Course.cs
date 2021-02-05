@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using AutoMapper;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace CheckNoteNet5.Shared.Models.Dtos
 {
+    [AutoMap(typeof(CourseEntry))]
     public class Course
     {
         public int Id { get; set; }

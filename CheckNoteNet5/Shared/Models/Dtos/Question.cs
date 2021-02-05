@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using AutoMapper;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
 namespace CheckNoteNet5.Shared.Models.Dtos
 {
+    [AutoMap(typeof(BinaryQuestionModel))]
+    [AutoMap(typeof(UnaryQuestionModel))]
     public class Question
     {
         public int Id { get; set; }
@@ -12,6 +15,8 @@ namespace CheckNoteNet5.Shared.Models.Dtos
         [Required]
         public int NoteId { get; set; }
         public virtual Note Note { get; set; }
+        public int? RootId { get; set; }
+        public virtual Note Root { get; set; }
         public string Text { get; set; }
         [Required]
         public QuestionType Type { get; set; }
@@ -19,7 +24,12 @@ namespace CheckNoteNet5.Shared.Models.Dtos
         [Required]
         public QuestionDifficulty Difficulty { get; set; }
         public virtual ICollection<Answer> Answers { get; init; }
-        public virtual ICollection<Tag> Tags { get; init; }
+        public bool Answer(bool answer) 
+            => Type == QuestionType.Binary && Correct == answer;
+        public bool Answer(HashSet<int> answers) 
+            => answers != null && Type == QuestionType.Binary && Answers.Select(a => a.Id).ToHashSet().SetEquals(answers);
+        public bool Answer(HashSet<string> answers) 
+            => answers != null && Type == QuestionType.Binary && Answers.Select(a => a.Text).ToHashSet().SetEquals(answers);
 
         public Question()
         { }
@@ -47,28 +57,18 @@ namespace CheckNoteNet5.Shared.Models.Dtos
         Input
     }
 
-    public class Question<TAnswer> : Question
-    {
-        public Question(string text, QuestionType type, Note note) : base(text, type, note)
-        { }
-        public virtual bool Answerr(TAnswer answer) => false;
-    }
-
-    public class BinaryQuestion : Question<bool>
+    public class BinaryQuestion : Question
     {
         public BinaryQuestion(string text, Note note) : base(text, QuestionType.Binary, note) { }
-        public override bool Answerr(bool answer) => Correct == answer;
     }
 
-    public class SelectQuestion : Question<HashSet<int>>
+    public class SelectQuestion : Question
     {
         public SelectQuestion(string text, Note note) : base(text, QuestionType.Select, note) { }
-        public override bool Answerr(HashSet<int> answers) => Answers.Select(a => a.Id).ToHashSet().SetEquals(answers);
     }
 
-    public class InputQuestion : Question<HashSet<string>>
+    public class InputQuestion : Question
     {
         public InputQuestion(string text, Note note) : base(text, QuestionType.Input, note) { }
-        public override bool Answerr(HashSet<string> answers) => Answers.Select(a => a.Text).ToHashSet().SetEquals(answers); // rename (fuck c#)
     }
 }

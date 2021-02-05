@@ -41,6 +41,8 @@ namespace CheckNoteNet5.Server.Services
             return (int)userId;
         }
 
+        public void AssertAuthentication() { GetUserId(); }
+
         public async Task<ServiceResult<UserModel>> GetUser()
         {
             var result = new ServiceResult<UserModel>();

@@ -26,6 +26,7 @@ namespace CheckNote.Server
             CreateMap<AnswerInput, Answer>();
             CreateMap<Answer, AnswerModel>();
 
+            CreateMap<TagModel, Tag>();
             CreateMap<Tag, TagModel>();
         }
     }

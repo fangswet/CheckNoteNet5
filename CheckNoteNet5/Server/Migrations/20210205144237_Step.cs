@@ -212,11 +212,15 @@ namespace CheckNoteNet5.Server.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false, defaultValueSql: "NEXT VALUE FOR IDSequence"),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Url = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ContentId = table.Column<int>(type: "int", nullable: false),
                     AuthorId = table.Column<int>(type: "int", nullable: false),
                     ParentId = table.Column<int>(type: "int", nullable: true),
-                    ModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    RootId = table.Column<int>(type: "int", nullable: true),
+                    IsRoot = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    ModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
                 constraints: table =>
                 {
@@ -236,6 +240,12 @@ namespace CheckNoteNet5.Server.Migrations
                     table.ForeignKey(
                         name: "FK_Notes_Notes_ParentId",
                         column: x => x.ParentId,
+                        principalTable: "Notes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Notes_Notes_RootId",
+                        column: x => x.RootId,
                         principalTable: "Notes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -318,6 +328,30 @@ namespace CheckNoteNet5.Server.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "NoteLikes",
+                columns: table => new
+                {
+                    NoteId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_NoteLikes", x => new { x.NoteId, x.UserId });
+                    table.ForeignKey(
+                        name: "FK_NoteLikes_AspNetUsers_NoteId",
+                        column: x => x.NoteId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_NoteLikes_Notes_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Notes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "NoteTags",
                 columns: table => new
                 {
@@ -349,6 +383,7 @@ namespace CheckNoteNet5.Server.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     NoteId = table.Column<int>(type: "int", nullable: false),
+                    RootId = table.Column<int>(type: "int", nullable: true),
                     Text = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Type = table.Column<int>(type: "int", nullable: false),
                     Correct = table.Column<bool>(type: "bit", nullable: true),
@@ -359,6 +394,32 @@ namespace CheckNoteNet5.Server.Migrations
                     table.PrimaryKey("PK_Questions", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Questions_Notes_NoteId",
+                        column: x => x.NoteId,
+                        principalTable: "Notes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Questions_Notes_RootId",
+                        column: x => x.RootId,
+                        principalTable: "Notes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Snippet",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    NoteId = table.Column<int>(type: "int", nullable: false),
+                    Text = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Snippet", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Snippet_Notes_NoteId",
                         column: x => x.NoteId,
                         principalTable: "Notes",
                         principalColumn: "Id",
@@ -384,30 +445,6 @@ namespace CheckNoteNet5.Server.Migrations
                         principalTable: "Questions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "QuestionTags",
-                columns: table => new
-                {
-                    QuestionId = table.Column<int>(type: "int", nullable: false),
-                    TagId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_QuestionTags", x => new { x.QuestionId, x.TagId });
-                    table.ForeignKey(
-                        name: "FK_QuestionTags_Questions_QuestionId",
-                        column: x => x.QuestionId,
-                        principalTable: "Questions",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_QuestionTags_Tags_TagId",
-                        column: x => x.TagId,
-                        principalTable: "Tags",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
@@ -470,6 +507,11 @@ namespace CheckNoteNet5.Server.Migrations
                 column: "AuthorId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_NoteLikes_UserId",
+                table: "NoteLikes",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Notes_AuthorId",
                 table: "Notes",
                 column: "AuthorId");
@@ -485,6 +527,11 @@ namespace CheckNoteNet5.Server.Migrations
                 column: "ParentId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Notes_RootId",
+                table: "Notes",
+                column: "RootId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_NoteTags_TagId",
                 table: "NoteTags",
                 column: "TagId");
@@ -495,9 +542,14 @@ namespace CheckNoteNet5.Server.Migrations
                 column: "NoteId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_QuestionTags_TagId",
-                table: "QuestionTags",
-                column: "TagId");
+                name: "IX_Questions_RootId",
+                table: "Questions",
+                column: "RootId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Snippet_NoteId",
+                table: "Snippet",
+                column: "NoteId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TestResults_CourseId",
@@ -537,19 +589,22 @@ namespace CheckNoteNet5.Server.Migrations
                 name: "CourseNotes");
 
             migrationBuilder.DropTable(
+                name: "NoteLikes");
+
+            migrationBuilder.DropTable(
                 name: "NoteTags");
 
             migrationBuilder.DropTable(
-                name: "QuestionTags");
+                name: "Snippet");
 
             migrationBuilder.DropTable(
                 name: "TestResults");
 
             migrationBuilder.DropTable(
-                name: "AspNetRoles");
+                name: "Questions");
 
             migrationBuilder.DropTable(
-                name: "Questions");
+                name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "Tags");
